@@ -35,7 +35,7 @@ class Object3
 		virtual void SetPosition(const vec3& position);
 		virtual void SetPosition(real x, real y, real z);
 		
-		virtual void SetRotation(const vec3& direction);
+		virtual void SetRotation(const quat& rotation);
 		virtual void SetRotation(real yaw, real pitch, real roll);
 
 		vec3 GetPosition(void) const;

@@ -22,13 +22,14 @@ void Server::Update(void)
 	{
 		// add client if just connected
 		bool newclient = true;
+		
+		uint i = 0;
 
-		for(uint i = 0; i < clients.size(); i++)
+		for(i; i < clients.size(); i++)
 		{
 			if(clients[i].add == client.add) 
 			{
 				newclient = false;
-				client = clients[i];
 				break;
 			}
 		}
@@ -44,16 +45,27 @@ void Server::Update(void)
 
 		real mov = Clock.GetTimeDelta() * 5.0f;
 
-		if(pack.w) client.obj.MoveRelative(vec3::Forward() * mov);
-		if(pack.a) client.obj.MoveRelative(-vec3::Right() * mov);
-		if(pack.s) client.obj.MoveRelative(vec3::Right() * mov);
-		if(pack.d) client.obj.MoveRelative(-vec3::Forward() * mov);
+		if(pack.w) clients[i].obj.MoveRelative(vec3::Forward() * mov);
+		if(pack.a) clients[i].obj.MoveRelative(-vec3::Right() * mov);
+		if(pack.s) clients[i].obj.MoveRelative(-vec3::Forward() * mov);
+		if(pack.d) clients[i].obj.MoveRelative(vec3::Right() * mov);
 
-		client.obj.Rotate(pack.dx, 0, 0);
+		clients[i].obj.Rotate(pack.dx, 0, 0);
 	}
+	
+	// send data
+	char out[4069];
+
+	uint num = clients.size();
+	memcpy(out, &num, sizeof(uint));
 
 	for(uint i = 0; i < clients.size(); i++)
 	{
-		Send(clients[i].add, &clients[i].obj, sizeof(clients[i].obj));
+		memcpy(out + sizeof(uint) + i * sizeof(Object3), &clients[i].obj, sizeof(Object3));
+	}
+		
+	for(uint i = 0; i < clients.size(); i++)
+	{
+		Send(clients[i].add, &out, sizeof(uint) + sizeof(Object3) * clients.size());
 	}
 }

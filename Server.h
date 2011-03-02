@@ -16,14 +16,18 @@
 
 using namespace std;
 
-struct Package
+class Package
 {
-	bool w;
-	bool a;
-	bool s;
-	bool d;
+	public:
 
-	real dx;
+		Package(void) : w(false), a(false), s(false), d(false), dx(0) {};
+
+		bool w;
+		bool a;
+		bool s;
+		bool d;
+
+		real dx;
 };
 
 struct Player

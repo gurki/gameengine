@@ -99,9 +99,9 @@ void Object3::SetPosition(real x, real y, real z)
 	pos = vec3(x, y, z);
 }
 
-void Object3::SetRotation(const vec3& direction)
+void Object3::SetRotation(const quat& rotation)
 {
-	rot = quat(direction);
+	rot = rotation;
 }
 
 void Object3::SetRotation(real yaw, real pitch, real roll)
