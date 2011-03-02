@@ -61,14 +61,14 @@ void Color::SetGray(float Gray, float Alpha)
 
 void Color::SetAlpha(float Alpha)
 {
-	A = limit(Alpha, 1.0f, 0.0f);
+	A = limit(Alpha, 0.0f, 1.0f);
 }
 
 void Color::SetHLS(float H, float L, float S, float Alpha)
 {
 	HLS[0] = modf(H, 1.0f);
-	HLS[1] = limit(L, 1.0f, 0.0f);
-	HLS[2] = limit(S, 1.0f, 0.0f);
+	HLS[1] = limit(L, 0.0f, 1.0f);
+	HLS[2] = limit(S, 0.0f, 1.0f);
 
 	SetAlpha(Alpha);
 
@@ -82,8 +82,8 @@ void Color::SetHLS(float H, float L, float S, float Alpha)
 void Color::SetHSV(float H, float S, float V, float Alpha)
 {
 	HSV[0] = modf(H, 1.0f);
-	HSV[1] = limit(S, 1.0f, 0.0f);
-	HSV[2] = limit(V, 1.0f, 0.0f);
+	HSV[1] = limit(S, 0.0f, 1.0f);
+	HSV[2] = limit(V, 0.0f, 1.0f);
 
 	SetAlpha(Alpha);
 
@@ -96,9 +96,9 @@ void Color::SetHSV(float H, float S, float V, float Alpha)
 
 void Color::SetRGB(float R, float G, float B, float Alpha)
 {
-	RGB[0] = limit(R, 1.0f, 0.0f);
-	RGB[1] = limit(G, 1.0f, 0.0f);
-	RGB[2] = limit(B, 1.0f, 0.0f);
+	RGB[0] = limit(R, 0.0f, 1.0f);
+	RGB[1] = limit(G, 0.0f, 1.0f);
+	RGB[2] = limit(B, 0.0f, 1.0f);
 
 	SetAlpha(Alpha);
 
@@ -110,9 +110,9 @@ void Color::SetRGB(float R, float G, float B, float Alpha)
 
 void Color::SetCMY(float C, float M, float Y, float Alpha)
 {
-	CMY[0] = limit(C, 1.0f, 0.0f);
-	CMY[1] = limit(M, 1.0f, 0.0f);
-	CMY[2] = limit(Y, 1.0f, 0.0f);
+	CMY[0] = limit(C, 0.0f, 1.0f);
+	CMY[1] = limit(M, 0.0f, 1.0f);
+	CMY[2] = limit(Y, 0.0f, 1.0f);
 
 	SetAlpha(Alpha);
 
@@ -125,10 +125,10 @@ void Color::SetCMY(float C, float M, float Y, float Alpha)
 
 void Color::SetCMYK(float C, float M, float Y, float K, float Alpha)
 {
-	CMYK[0] = limit(C, 1.0f, 0.0f);
-	CMYK[1] = limit(M, 1.0f, 0.0f);
-	CMYK[2] = limit(Y, 1.0f, 0.0f);
-	CMYK[3] = limit(K, 1.0f, 0.0f);
+	CMYK[0] = limit(C, 0.0f, 1.0f);
+	CMYK[1] = limit(M, 0.0f, 1.0f);
+	CMYK[2] = limit(Y, 0.0f, 1.0f);
+	CMYK[3] = limit(K, 0.0f, 1.0f);
 
 	SetAlpha(Alpha);
 

@@ -18,15 +18,14 @@ class CNetwork
 	public:
 
 		bool Initialize(void);
-		void Shutdown(void);
 
 		const char* GetHostName(void) const;
-		IPAddress GetHostAddress(void) const;
+		const char* GetHostAddress(void) const;
 
 	private:
 
 		char name[128];
-		IPAddress address;
+		const char* address;
 
 	public:
 
@@ -41,7 +40,7 @@ class CNetwork
 		CNetwork(void) {};
 		CNetwork(CNetwork const&) {};
 		CNetwork& operator = (CNetwork const&) { return *this; };
-		~CNetwork(void) {};
+		~CNetwork(void);
 };
 
 #endif

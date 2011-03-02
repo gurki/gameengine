@@ -8,7 +8,7 @@
 #ifndef _OBJECT3_H
 #define _OBJECT3_H
 
-#include "Types.h"
+#include "MathLib.h"
 #include "Vector3.h"
 #include "Quaternion.h"
 
@@ -18,29 +18,28 @@ class Object3
 
 		Object3(void);
 		Object3(const vec3& position, const quat& rotation);
+		Object3(real x, real y, real z, real yaw = 0, real pitch = 0, real roll = 0);
 
-		void Move(const vec3& direction);
-		void MoveRelative(const vec3& direction);
+		virtual void Move(const vec3& direction);
+		virtual void Move(real x, real y, real z);
 
-		void MoveTowards(const vec3& point, real distance);
-		void MoveAlong(const vec3& direction, real distance);
+		virtual void MoveRelative(const vec3& direction);
+		virtual void MoveRelative(real x, real y, real z);
 
-		void Rotate(const quat& rotation);
-		void Rotate(real yaw, real pitch, real roll);
-		void RotateAroundAxis(const vec3& axis, real angle);
+		virtual void LookAt(const vec3& point);
+		virtual void LookAt(real yaw, real pitch, real roll);
 
-		void LookAt(const vec3& point);
-		void LookAwayFrom(const vec3& point);
+		virtual void Rotate(const vec3& direction);
+		virtual void Rotate(real yaw, real pitch, real roll);
 
-		void SetPosition(const vec3& position);
-		void SetRelativePosition(Object3& object, const vec3& position);
+		virtual void SetPosition(const vec3& position);
+		virtual void SetPosition(real x, real y, real z);
+		
+		virtual void SetRotation(const vec3& direction);
+		virtual void SetRotation(real yaw, real pitch, real roll);
 
-		void SetRotation(const quat& rotation);
-		void SetRotation(const vec3& axis, real angle);
-		void SetRotation(real yaw, real pitch, real roll);
-
-		vec3 GetPosition(void);
-		quat GetRotation(void);
+		vec3 GetPosition(void) const;
+		quat GetRotation(void) const;
 
 	protected:
 

@@ -21,28 +21,26 @@ using namespace std;
 	#include <sys/socket.h>
 	#include <netinet/in.h>
 	#include <arpa/inet.h>
+
 	#include <fcntl.h>
+	#include <netdb.h>
 #endif
 
 #ifdef OS_WINDOWS
 	typedef int socklen_t;
 #endif
 
-#ifndef OS_WINDOWS
-	
-#endif
-
-class IPAddress
+class Address
 {
 	public:
 
-		IPAddress(void);
-		IPAddress(uint address);
-		IPAddress(char* address);
-		IPAddress(uchar a, uchar b, uchar c, uchar d);
+		Address(void);
+		Address(uint address, ushort port);
+		Address(char* address, ushort port);
+		Address(uchar a, uchar b, uchar c, uchar d, ushort port);
 
-		bool operator == (const IPAddress& add) const;
-		bool operator != (const IPAddress& add) const;
+		bool operator == (const Address& add) const;
+		bool operator != (const Address& add) const;
 
 		uchar GetA(void) const;
 		uchar GetB(void) const;
@@ -50,18 +48,15 @@ class IPAddress
 		uchar GetD(void) const;
 
 		uint GetAddress(void) const;
+
+		ushort GetPort(void) const;
 	
-		string GetString(void) const;
+		string GetIPString(void) const;
 
 	private:
 
-		in_addr address;
-};
-
-struct NetworkAddress
-{
-	IPAddress address;
-	ushort port;
+		uint address;
+		ushort port;
 };
 
 #endif

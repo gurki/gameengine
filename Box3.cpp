@@ -1,9 +1,16 @@
+//***************************************************************************//
+//                                                                           //
+//                          Gurki Media Productions                          //
+//                             (C) Tobias Gurdan                             //
+//                                                                           //
+//***************************************************************************//
+
 #include "Box3.h"
 #include "OpenGL.h"
 
 Box3::Box3(void) : Object3()
 {
-	dim = vec3(1, 1, 1);
+	dim = vec3::One();
 }
 
 Box3::Box3(const vec3& position, const quat& rotation, const vec3& dimensions) : Object3(position, rotation)
@@ -13,7 +20,6 @@ Box3::Box3(const vec3& position, const quat& rotation, const vec3& dimensions) :
 
 void Box3::Render(void)
 {
-/*
 	real x0 = - dim.x / 2.0;
 	real x1 = - x0;
 
@@ -22,15 +28,6 @@ void Box3::Render(void)
 
 	real z0 = - dim.z / 2.0;
 	real z1 = - z0;
-*/
-	real x0 = 0;
-	real x1 = dim.x;
-
-	real y0 = 0;
-	real y1 = dim.y;
-
-	real z0 = 0;
-	real z1 = dim.z;
 
 	vec3 axis;
 	real angle;
@@ -38,9 +35,10 @@ void Box3::Render(void)
 	rot.GetAxisAngle(axis, angle);
 
 	glPushMatrix();
-	
-	glRotatef(angle, axis.x, axis.y, axis.z);
+
 	glTranslatef(pos.x, pos.y, pos.z);
+
+	glRotatef(angle, axis.x, axis.y, axis.z);
 
 	glBegin(GL_TRIANGLE_STRIP);
 

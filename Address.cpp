@@ -7,68 +7,79 @@
 
 #include "Address.h"
 
-#include <stdio.h>
-
-IPAddress::IPAddress(void)
+Address::Address(void)
 {
-	this->address.S_un.S_addr = (127 << 24) | (0 << 16) | (0 << 8) | 1;
+	address = (127 << 24) | (0 << 16) | (0 << 8) | 1;
+	port = 31415;
 }
 
-IPAddress::IPAddress(uint address)
+Address::Address(uint address, ushort port)
 {
-	this->address.S_un.S_addr = address;
+	this->address = address;
+	this->port = port;
 }
 
-IPAddress::IPAddress(char* string)
+Address::Address(char* string, ushort port)
 {
-	this->address.S_un.S_addr = inet_addr(string);
+	this->address = ntohl(inet_addr(string));
+	this->port = port;
 }
 
-IPAddress::IPAddress(uchar a, uchar b, uchar c, uchar d)
+Address::Address(uchar a, uchar b, uchar c, uchar d, ushort port)
 {
-	this->address.S_un.S_addr = (a << 24) | (b << 16) | (c << 8) | d;
+	this->address = (a << 24) | (b << 16) | (c << 8) | d;
+	this->port = port;
 }
 
-bool IPAddress::operator == (const IPAddress& add) const
+bool Address::operator == (const Address& add) const
 {
-	return address.S_un.S_addr == add.GetAddress();
+	return address == add.GetAddress() && port == add.GetPort();
 }
 
-bool IPAddress::operator != (const IPAddress& add) const
+bool Address::operator != (const Address& add) const
 {
-	return address.S_un.S_addr != add.GetAddress();
+	return address != add.GetAddress() || port == add.GetPort();
 }
 
-uchar IPAddress::GetA(void) const
+uchar Address::GetA(void) const
 {
-	return address.S_un.S_un_b.s_b1;
+	return address >> 24;
 }
 
-uchar IPAddress::GetB(void) const
+uchar Address::GetB(void) const
 {
-	return address.S_un.S_un_b.s_b2;
+	return address >> 16;
 }
 
-uchar IPAddress::GetC(void) const
+uchar Address::GetC(void) const
 {
-	return address.S_un.S_un_b.s_b3;
+	return address >> 8;
 }
 
-uchar IPAddress::GetD(void) const
+uchar Address::GetD(void) const
 {
-	return address.S_un.S_un_b.s_b4;
+	return address;
 }
 
-uint IPAddress::GetAddress(void) const
+uint Address::GetAddress(void) const
 {
-	return address.S_un.S_addr;
+	return address;
 }
 
-string IPAddress::GetString(void) const
+ushort Address::GetPort(void) const
+{
+	return port;
+}
+
+string Address::GetIPString(void) const
 {
 	char ip[24] = {};
 
-	sprintf(ip, "%i.%i.%i.%i", GetA(), GetB(), GetC(), GetD());
+	#ifdef OS_WINDOWS
+		sprintf_s(ip, 24, "%i.%i.%i.%i", GetA(), GetB(), GetC(), GetD());
+	#else
+		snprintf(ip, 24, "%i.%i.%i.%i", GetA(), GetB(), GetC(), GetD());
+	#endif
 	
 	return string(ip);
 }

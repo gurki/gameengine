@@ -23,37 +23,40 @@ template <class T> inline T min3(T a, T b, T c) { return min2(min2(a, b), c); }
 template <class T> inline T max3(T a, T b, T c) { return max2(max2(a, b), c); }
 
 // remainder
-template <class T> inline T mod(T a, T b) { return ((a >= 0) ? a - (a / b) * b : (1 - (a / b)) * b + a); }
+#define mod(a, b) ((a >= 0) ? (real)a - (int)(a / b) * (real)b : (1 - (int)(a / b)) * (real)b + (real)a)
 
 #define modi(a, b) ((a >= 0) ? (int)   a - (int)(a / b) * (int)   b : (1 - (int)(a / b)) * (int)   b + (int)   a)
 #define modf(a, b) ((a >= 0) ? (float) a - (int)(a / b) * (float) b : (1 - (int)(a / b)) * (float) b + (float) a)
 #define modd(a, b) ((a >= 0) ? (double)a - (int)(a / b) * (double)b : (1 - (int)(a / b)) * (double)b + (double)a)
 
-#define rem(a) abs(fmod(a, 1.0))
+#define rem(a) (absr(mod(a, 1.0)))
 
-template <class T> inline int round(T a) { return (rem(a) < 0.5) ? floor(a) : ceil(a); }
+#define round(a) ((rem(a) < 0.5) ? floor(a) : ceil(a))
 
 // limiting
 #define stick(n, inf) ((n < inf) ? inf : n)
 #define clamp(n, sup) ((n > sup) ? sup : n)
 
-#define limit(n, sup, inf) (stick( clamp(n, sup), inf ))
+#define limit(n, inf, sup) (stick( clamp(n, sup), inf ))
 
 // integers
 #define floor(a) (int)(a)
 #define ceil(a) (int)(a) + 1
 
-// #define abs(a) ((a >= 0) ? a : -a) 
+#define absr(a) ((a >= 0) ? a : -a) 
 
 // trigonometry
-#define sin(a) (real)sin(a)
-#define cos(a) (real)cos(a)
-#define tan(a) (real)tan(a)
+#define sinr(a) (real)sin(a)
+#define cosr(a) (real)cos(a)
+#define tanr(a) (real)tan(a)
 
-#define asin(a) (real)asin(a)
-#define acos(a) (real)acos(a)
-#define atan(a) (real)atan(a)
-#define atan2(a, b) (real)atan2(a, b)
+#define asinr(a) (real)asin(a)
+#define acosr(a) (real)acos(a)
+#define atanr(a) (real)atan(a)
+#define atan2r(a, b) (real)atan2(a, b)
+
+// sqrt
+#define sqrtr(a) (real)sqrt(a)
 
 // prime
 inline bool isPrime(int n);

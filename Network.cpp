@@ -39,13 +39,12 @@ bool CNetwork::Initialize(void)
 
 	struct in_addr hostaddr;   
 	memcpy(&hostaddr, host->h_addr, sizeof(struct in_addr));
-
-	address = IPAddress(hostaddr.S_un.S_addr);
-
+	address = inet_ntoa(hostaddr);
+	
 	return true;
 }
 
-void CNetwork::Shutdown(void)
+CNetwork::~CNetwork(void)
 {
 	#ifdef OS_WINDOWS
 		WSACleanup();
@@ -57,7 +56,7 @@ const char* CNetwork::GetHostName(void) const
 	return name;
 }
 
-IPAddress CNetwork::GetHostAddress(void) const
+const char* CNetwork::GetHostAddress(void) const
 {
 	return address;
 }

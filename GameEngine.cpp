@@ -6,6 +6,7 @@
 //***************************************************************************//
 
 #include "GameEngine.h"
+#include "Network.h"
 
 //***************************************************************************//
 //                            The GameEngine Class                           //
@@ -13,74 +14,37 @@
 
 // GAMEENGINE HANDLING
 
-void CGameEngine::Initialize(int argc, char** argv, unsigned int mode, char* title, unsigned int width, unsigned int height)
+void CGameEngine::Initialize(int argc, char** argv)
 {
-	m_mode = mode;
-
-	if(m_mode > GAME_MODE_3D)
-	{
-		m_mode = GAME_MODE_3D;
-	}
-
 	glutInit(&argc, argv);
-	
 
-	if(m_mode == GAME_MODE_2D)
-	{
-		glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
-
-		// glDisable(GL_DEPTH_TEST);
-	}
-	else
-	{
-		glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
-	}
-
-	glutInitWindowSize(width, height);
-	glutInitWindowPosition((glutGet(GLUT_SCREEN_WIDTH) - width) >> 1, (glutGet(GLUT_SCREEN_HEIGHT) - height) >> 1);
-	glutCreateWindow(title);
-
-	glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-
-	if(m_mode == GAME_MODE_2D)
-	{
-		glDisable(GL_LIGHTING);
-		glDisable(GL_DEPTH_TEST);
-	}
-	else
-	{
-		glEnable(GL_DEPTH_TEST);
-		glDepthFunc(GL_LEQUAL);
-		glClearDepth(1.0f);
-
-		glEnable(GL_LIGHTING);
-		glEnable(GL_LIGHT0);
-		glEnable(GL_COLOR_MATERIAL);
-
-		glShadeModel(GL_SMOOTH);
-	}
-
-	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
-
-	glutIdleFunc(IdleFunction);
-	glutDisplayFunc(RenderFunction);
-	glutReshapeFunc(ReshapeFunction);
+	Window.Initialize();
+	Network.Initialize();
 
 	m_paused = false;
 	m_running = false;
-	m_initialized = true;
 
-	Mouse.Initialize();
-	Keyboard.Initialize();
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LEQUAL);
+	glClearDepth(1.0f);
 
-	// TextureManager.Initialize();
+	glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHT0);
+	glEnable(GL_COLOR_MATERIAL);
+
+	glShadeModel(GL_SMOOTH);
+	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 }
 
 void CGameEngine::Start(void)
 {
-	if(m_initialized == true && m_running == false)
+	if(m_running == false)
 	{
 		m_running = true;
+
+		
+		glutIdleFunc(IdleFunction);
+		glutDisplayFunc(RenderFunction);
 
 		glutMainLoop();
 	}
@@ -88,8 +52,6 @@ void CGameEngine::Start(void)
 
 void CGameEngine::End(void)
 {
-	// TextureManager.Deinitialize();
-
 	exit(EXIT_SUCCESS);
 }
 
@@ -108,18 +70,6 @@ bool CGameEngine::IsPaused(void)
 	return m_paused;
 }
 
-unsigned int CGameEngine::GetGameMode(void)
-{
-	return m_mode;
-}
-
-void CGameEngine::RegisterCallbacks(func render, func idle, func input)
-{
-	m_idle = idle;
-	m_input = input;
-	m_render = render;	
-}
-
 void CGameEngine::ClearInput(void)
 {
 	Mouse.ClearButtons();
@@ -128,16 +78,14 @@ void CGameEngine::ClearInput(void)
 
 void CGameEngine::IdleFunction(void)
 {
+	Clock.Update();
+
 	InputFunction();
 
 	if(GameEngine.IsPaused() == false)
 	{
-		if(GameEngine.GetIdlePointer() != NULL)
-		{
-			GameEngine.GetIdlePointer()();
-		}
-		
-		RenderFunction();
+		GameEngine.Idle();
+		GameEngine.Render();
 	}
 
 	GameEngine.ClearInput();
@@ -150,92 +98,15 @@ void CGameEngine::InputFunction(void)
 		GameEngine.End();
 	}
 
-	// Camera.HandleInput();
-
-	if(GameEngine.GetInputPointer() != NULL) 
-	{
-		GameEngine.GetInputPointer()();
-	}
+	GameEngine.Input();
 }
 
 void CGameEngine::RenderFunction(void)
 {
 	if(GameEngine.IsPaused() == false)
 	{
-		if(GameEngine.GetRenderPointer() != NULL)
-		{
-			GameEngine.GetRenderPointer()();
-		}
-		else
-		{
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-			glLoadIdentity();	
-
-			glutSwapBuffers();
-		}
+		GameEngine.Render();
 	}
-}
-
-void CGameEngine::ReshapeFunction(int width, int height)
-{
-	if(height == 0) 
-	{
-		height = 1;
-	}
-
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-
-	if(GameEngine.GetGameMode() == GAME_MODE_2D) 
-	{	
-		gluOrtho2D(0, width, 0, height);
-		glViewport(0, 0, width, height);
-	} 
-	else
-	{
-		float ratio = (float)width / (float)height;
-
-		gluPerspective(75.0f, ratio, 1.0f, 1000.0f);
-		glViewport(0, 0, width, height);
-	}
-
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-}
-
-func CGameEngine::GetIdlePointer(void)
-{
-	return m_idle;
-}
-
-func CGameEngine::GetInputPointer(void)
-{
-	return m_input;	
-}
-
-func CGameEngine::GetRenderPointer(void)
-{
-	return m_render;	
-}
-
-unsigned int GetWindowWidth(void)
-{
-	return glutGet(GLUT_WINDOW_WIDTH);
-}
-
-unsigned int GetWindowHeight(void)
-{
-	return glutGet(GLUT_WINDOW_HEIGHT);
-}
-
-unsigned int GetScreenWidth(void)
-{
-	return glutGet(GLUT_SCREEN_WIDTH);
-}
-
-unsigned int GetScreenHeight(void)
-{
-	return glutGet(GLUT_SCREEN_HEIGHT);
 }
 
 //***************************************************************************//
@@ -244,7 +115,7 @@ unsigned int GetScreenHeight(void)
 
 // KEYBOARD HANDLING
 
-void CKeyboard::Initialize(void) 
+CKeyboard::CKeyboard(void) 
 {
 	glutIgnoreKeyRepeat(true);
 
@@ -367,7 +238,7 @@ void CKeyboard::SpecialUpFunc(int key, int x, int y)
 
 // MOUSE HANDLING
 
-void CMouse::Initialize(void)
+CMouse::CMouse(void)
 {
 	glutMouseFunc(CMouse::MouseFunc);
 	glutEntryFunc(CMouse::EntryFunc);
@@ -375,7 +246,6 @@ void CMouse::Initialize(void)
 	glutPassiveMotionFunc(CMouse::PassiveMotionFunc);
 
 	Center();
-	HideCursor();
 }
 
 void CMouse::ClearButtons(void) {
@@ -455,15 +325,15 @@ void CMouse::SetPosition(int iPositionX, int iPositionY)
 
 // MOUSE GETTERS
 
-vec2i CMouse::Position(void){
+vec2 CMouse::Position(void){
 	return m_vPosition;
 }
 
-vec2i CMouse::PositionDelta(void) {
+vec2 CMouse::PositionDelta(void) {
 	return m_vPositionDelta;
 }
 
-vec2i CMouse::ClickEventPosition(void) {
+vec2 CMouse::ClickEventPosition(void) {
 	return m_vClickEventPosition;
 }
 

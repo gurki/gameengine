@@ -11,8 +11,10 @@
 #include "OpenGL.h"
 #include "Vector2.h"
 #include "Color.h"
+#include "Window.h"
+#include "Timer.h"
 
-typedef void (*func)(void);
+#include "Types.h"
 
 enum GAME_MODES
 {
@@ -32,9 +34,8 @@ class CGameEngine
 
 		// GAMEENGINE HANDLING
 
-		void Initialize(int argc, char** argv, unsigned int mode = GAME_MODE_3D, char* title = "Gurki Media Productions", unsigned int width = 1024, unsigned int height = 768);
-		void RegisterCallbacks(func render = NULL, func idle = NULL, func input = NULL);
-
+		void Initialize(int argc, char** argv);
+		
 		void Start(void);
 		void End(void);
 		void Unpause(void);
@@ -44,34 +45,18 @@ class CGameEngine
 
 		bool IsPaused(void);
 
-		unsigned int GetWindowWidth(void);
-		unsigned int GetWindowHeight(void);
-		unsigned int GetScreenWidth(void);
-		unsigned int GetScreenHeight(void);
+		virtual void Idle(void) const;
+		virtual void Render(void) const;
+		virtual void Input(void) const;
 
 	private:
 
 		void ClearInput(void);
-
-		unsigned int GetGameMode(void);
-
-		func GetIdlePointer(void);
-		func GetInputPointer(void);
-		func GetRenderPointer(void);
-
+		
 		static void IdleFunction(void);
 		static void InputFunction(void);
 		static void RenderFunction(void);
 
-		static void ReshapeFunction(int x, int y);
-
-		func m_idle;
-		func m_input;
-		func m_render;
-
-		unsigned int m_mode;
-
-		bool m_initialized;
 		bool m_running;
 		bool m_paused;
 
@@ -105,7 +90,6 @@ class CKeyboard
 
 		// KEYBOARD HANDLÌNG
 
-		void Initialize(void);
 		void ClearKeys(void);
 
 		// KEYBOARD GETTERS
@@ -149,7 +133,7 @@ class CKeyboard
 
 	private:
 
-		CKeyboard(void) {};
+		CKeyboard(void);
 		CKeyboard(CKeyboard const&) {};
 		CKeyboard& operator = (CKeyboard const&) { return *this; };
 		~CKeyboard(void) {};
@@ -174,7 +158,6 @@ class CMouse
 
 		// MOUSE HANDLING
 
-		void Initialize(void);
 		void ClearButtons(void);
 
 		void Center(void);
@@ -187,9 +170,9 @@ class CMouse
 
 		// MOUSE GETTERS
 
-		vec2i Position(void);
-		vec2i PositionDelta(void);
-		vec2i ClickEventPosition(void);
+		vec2 Position(void);
+		vec2 PositionDelta(void);
+		vec2 ClickEventPosition(void);
 
 		bool HasMoved(void);
 		bool CursorIsVisible(void);
@@ -208,9 +191,9 @@ class CMouse
 		void UpdatePosition(int x, int y);
 		void Click(int button, int state, int x, int y);
 
-		vec2i m_vPosition;
-		vec2i m_vPositionDelta;
-		vec2i m_vClickEventPosition;
+		vec2 m_vPosition;
+		vec2 m_vPositionDelta;
+		vec2 m_vClickEventPosition;
 
 		bool m_bHasMoved;
 		bool m_bCursorIsVisible;
@@ -231,7 +214,7 @@ class CMouse
 
 	private:
 
-		CMouse(void) {};
+		CMouse(void);
 		CMouse(CMouse const&) {};
 		CMouse& operator = (CMouse const&) { return *this; };
 		~CMouse(void) {};

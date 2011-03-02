@@ -7,37 +7,134 @@
 
 #include "Camera.h"
 #include "OpenGL.h"
+#include "Window.h"
 
-Camera::Camera(void) : PivotObject3()
+Camera* Camera::active = 0;
+
+Camera::Camera(void) : Object3()
 {
+	projection = CAMERA_PERSPECTIVE;
 
+	view = rect(0, 0, 1, 1);
+
+	ratio = 16.0 / 9.0;
+	fovy = 45.0;
+	near = 0.1;
+	far = 1000;
 }
 
-Camera::Camera(const vec3& position, const quat& rotation, const vec3& pivot) : PivotObject3(position, rotation, pivot)
+Camera::Camera(const vec3& position, const quat& rotation) : Object3(position, rotation)
 {
+	projection = CAMERA_PERSPECTIVE;
 
+	view = rect(0, 0, 1, 1);
+
+	ratio = 16.0 / 9.0;
+	fovy = 45.0;
+	near = 0.1;
+	far = 1000;
+}
+
+void Camera::UpdateView(void) const
+{
+	real w;
+	vec3 n;
+
+	rot.GetAxisAngle(n, w);
+
+	glRotatef(-w, n.x, n.y, n.z);
+	glTranslatef(-pos.x, -pos.y, -pos.z);
+}
+
+void Camera::SetActive(void) const
+{
+	active = (Camera*)this;
+
+	UpdateViewport();
+	UpdateView();
+}
+
+void Camera::UpdateViewport(void) const
+{
+	vec2 p;
+	vec2 d;
+
+	p.x = view.GetPosition().x * Window.GetDimensions().x; 
+	p.y = view.GetPosition().y * Window.GetDimensions().y;
+
+	d.x = view.GetDimensions().x * Window.GetDimensions().x;
+	d.y = view.GetDimensions().y * Window.GetDimensions().y;
+
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+
+	if(projection == CAMERA_ORTHOGRAPHIC)
+	{
+		glOrtho(0, d.x, d.y, 0, near, far);
+		glViewport(p.x, p.y, d.x, d.y);
+	}
+	else 
+	{
+		gluPerspective(fovy, ratio, near, far);
+		glViewport(p.x, p.y, d.x, d.y);
+	}
+
+	glMatrixMode(GL_MODELVIEW);
+}
+
+void Camera::SetPerspective(void)
+{
+	projection = CAMERA_PERSPECTIVE;
+
+	UpdateViewport();
 }
 
 void Camera::SetOrthographic(void)
 {
-	glMatrixMode(GL_PROJECTION_MATRIX);
-	glLoadIdentity();
+	projection = CAMERA_ORTHOGRAPHIC;
 
-	glOrtho(-1, 1, -1, 1, 0, 100);
-	glViewport(0, 0, 1024, 786);
-
-	glMatrixMode(GL_MODELVIEW_MATRIX);
-	glLoadIdentity();
+	UpdateViewport();
 }
 
-void Camera::SetProjective(void)
+void Camera::SetFieldOfView(real fovy)
 {
-	glMatrixMode(GL_PROJECTION_MATRIX);
-	glLoadIdentity();
+	this->fovy = stick(fovy, 1);
+	
+	UpdateViewport();
+}
 
-	glOrtho(-1, 1, -1, 1, 0, 100);
-	glViewport(0, 0, 1024, 786);
+void Camera::SetAspectRatio(real ratio)
+{
+	this->ratio = ratio;
 
-	glMatrixMode(GL_MODELVIEW_MATRIX);
-	glLoadIdentity();	
+	UpdateViewport();
+}
+
+void Camera::SetNearFar(real near, real far)
+{
+	this->far = stick(far, 0);
+	this->near = limit(near, 0, far);
+	
+	UpdateViewport();
+}
+
+void Camera::SetAbsoluteViewport(uint x, uint y, uint width, uint height)
+{
+	vec2 w = Window.GetDimensions();
+
+	view = rect(x / w.x, y / w.y, width / w.x, height / w.y);
+	
+	UpdateViewport();
+}
+
+void Camera::SetRelativeViewport(real x, real y, real width, real height)
+{
+	view = rect(x, y, width, height);
+	
+	UpdateViewport();
+}
+
+const Camera* Camera::GetActiveCamera(void)
+{
+	return active;
 }

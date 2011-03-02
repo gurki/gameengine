@@ -26,7 +26,8 @@ class PivotObject3 : public Object3
 		void SetRotationAroundPivot(real yaw, real pitch, real roll);
 
 		void SetPivot(const vec3& pivot);
-		vec3 GetPivot(void);
+
+		vec3 GetPivot(void) const;
 
 	protected:
 
