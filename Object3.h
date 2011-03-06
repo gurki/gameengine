@@ -17,7 +17,7 @@ class Object3
 	public:
 
 		Object3(void);
-		Object3(const vec3& position, const quat& rotation);
+		Object3(const vec3& position, const quat& rotation = quat::Identity());
 		Object3(real x, real y, real z, real yaw = 0, real pitch = 0, real roll = 0);
 
 		virtual void Move(const vec3& direction);
@@ -27,9 +27,9 @@ class Object3
 		virtual void MoveRelative(real x, real y, real z);
 
 		virtual void LookAt(const vec3& point);
-		virtual void LookAt(real yaw, real pitch, real roll);
+		virtual void LookAt(real x, real y, real z);
 
-		virtual void Rotate(const vec3& direction);
+		virtual void Rotate(const vec3& axis, real angle);
 		virtual void Rotate(real yaw, real pitch, real roll);
 
 		virtual void SetPosition(const vec3& position);

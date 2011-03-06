@@ -12,6 +12,7 @@ CTimer::CTimer(void)
 	last = GetRunTime();
 	frame = last;
 	fps = 0;
+	scale = 1;
 }
 
 void CTimer::Update(void)
@@ -41,10 +42,15 @@ real CTimer::GetRunTime(void) const
 
 real CTimer::GetTimeDelta(void) const
 {
-	return frame;
+	return frame * scale;
 }
 
 real CTimer::GetFrameRate(void) const
 {
 	return fps;
+}
+
+void CTimer::SetTimescale(real scale) 
+{
+	this->scale = scale;
 }

@@ -32,6 +32,7 @@ template <class T> inline T max3(T a, T b, T c) { return max2(max2(a, b), c); }
 #define rem(a) (absr(mod(a, 1.0)))
 
 #define round(a) ((rem(a) < 0.5) ? floor(a) : ceil(a))
+#define sign(a) (a >= 0 ? 1 : -1)
 
 // limiting
 #define stick(n, inf) ((n < inf) ? inf : n)
@@ -71,6 +72,8 @@ inline bool isPrime(int n);
 #define C_E          (real)2.71828182845904523536  // e
 #define C_PI         (real)3.14159265358979323846  // pi
 #define C_SQRT2      (real)1.41421356237309504880  // sqrt(2)
+
+#define C_2PI        (real)6.28318530717958647692  // 2*pi
 
 #define C_EDIV4      (real)0.679570457114761308840 // e/4
 #define C_PIDIV4     (real)0.785398163397448309616 // pi/4

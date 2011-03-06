@@ -77,8 +77,11 @@ class Vector3
 		};
 
 		static const Vector3 Up(void);
+		static const Vector3 Down(void);
+		static const Vector3 Left(void);
 		static const Vector3 Right(void);
 		static const Vector3 Forward(void);
+		static const Vector3 Backward(void);
 
 		static const Vector3 One(void);
 		static const Vector3 Zero(void);

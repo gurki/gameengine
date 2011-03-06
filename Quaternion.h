@@ -15,66 +15,94 @@
 
 using namespace std;
 
+// axisangle
+struct AxisAngle
+{
+	vec3 axis;
+	real angle;
+};
+
+// eulerangles
+struct EulerAngles
+{
+	real yaw;
+	real pitch;
+	real roll;
+};
+
+// quaternions
 class Quaternion
 {
 	public:
 
+		// constructors
 		Quaternion(void);
 		Quaternion(const real* v);
-		Quaternion(real x, real y, real z, real w);
+		Quaternion(real w, real x, real y, real z);
 
-		Quaternion(const vec3& axis, real angle);
-		Quaternion(real yaw, real pitch, real roll);
-
-		Quaternion(const vec3& from, const vec3& to);
-		Quaternion(const vec3& to);
-		
+		// assign operators
 		void operator = (const Quaternion& quat);
 
-		bool operator == (const Quaternion& quat)const;
+		// boolean operators
+		bool operator == (const Quaternion& quat) const;
 		bool operator != (const Quaternion& quat) const;
 
-		Quaternion operator * (const Quaternion& quat) const;
+		// real operators
+		Quaternion operator * (real n) const;
+		Quaternion operator / (real n) const;
+
+		Quaternion& operator *= (real n);
+		Quaternion& operator /= (real n);
+
+		friend Quaternion operator * (real n, const Quaternion& quat);
+
+		// vector operators
 		vec3 operator * (const vec3& vec) const;
 
 		friend vec3 operator * (const vec3& vec, const Quaternion& quat);
 
-		void operator *= (const Quaternion& quat);
+		// quaternion operators
+		Quaternion operator + (const Quaternion& quat) const;
+		Quaternion operator - (const Quaternion& quat) const;
+		Quaternion operator * (const Quaternion& quat) const;
 
-		void Normalise(void);
+		Quaternion& operator += (const Quaternion& quat);
+		Quaternion& operator -= (const Quaternion& quat);
+		Quaternion& operator *= (const Quaternion& quat);
+
+		// quaternion functions
 		Quaternion Normalised(void) const;
+		Quaternion& Normalise(void);
 
-		void Conjugate(void);
 		Quaternion Conjugated(void) const;
+		Quaternion& Conjugate(void);
 
-		void SetFromAxisAngle(const vec3& axis, real angle);
-		void SetFromEulerAngles(real yaw, real pitch, real roll); 
-		void SetFromDirections(const vec3& from, const vec3& to);
-		void SetFromDirection(const vec3& to);
+		// static setter
+		static Quaternion WithAxisAngle(const vec3& axis, real angle);
+		static Quaternion WithEulerAngles(real yaw, real pitch, real roll);
 
-		vec3 GetDirection(void) const;
+		static Quaternion WithOrientation(const vec3& orientation);
+		static Quaternion WithFromToOrientations(const vec3& from, const vec3& to);
+		
+		static Quaternion WithRotationAboutX(real angle);
+		static Quaternion WithRotationAboutY(real angle);
+		static Quaternion WithRotationAboutZ(real angle);
+		
+		// getter
+		vec3 GetOrientation(void) const;
+		AxisAngle GetAxisAngle(void) const;
+		EulerAngles GetEulerAngles(void) const;
 
-		vec3 GetAxis(void) const;
-		real GetAngle(void) const;
-
-		real GetYaw(void) const;
-		real GetPitch(void) const;
-		real GetRoll(void) const;
-
-		void GetAxisAngle(vec3& axis, real& angle) const;
-		void GetEulerAngles(real& yaw, real& pitch, real& roll) const;
-
+		// streams
 		friend ostream& operator << (ostream& out, const Quaternion& quat);
 		friend istream& operator >> (istream& in, Quaternion& quat);
-
-		union 
-		{
-			real v[4];
-			struct{ real x, y, z, w; };
-		};
-
+	
+		// static const members
 		static const Quaternion Zero(void);
 		static const Quaternion Identity(void);
+
+		// member variables
+		real w, x, y, z;
 };
 
 typedef Quaternion quat;

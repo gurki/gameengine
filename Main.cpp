@@ -11,36 +11,90 @@
 
 #include "Window.h"
 #include "Camera.h"
-#include "Network.h"
-#include "Server.h"
-#include <vector>
+#include "Integrator.h"
 
 using namespace std;
 
 Camera cam1;
 Grid3 grid;
-Socket sock;
-Server server;
-vector<Box3> boxes;
+Box3 box1, box2, box3;
+
+void clibrary(const double angle, double& s, double& c)
+{
+	s = sin(angle);
+	c = cos(angle);
+}
+
+void tangcon(const double angle, double& s, double& c)
+{
+	double z = tan(angle * 0.5);
+
+	s = 2 * z / (1 + z * z);
+	c = (1 - z * z) / (1 + z * z);
+}
+
+void trigid(const double angle, double& s, double& c)
+{
+	int sign = (angle - C_PIDIV2 < C_PI ? 1 : -1);
+
+	s = sin(angle);
+	c = sqrt(1 - s * s);
+}
 
 int main(int argc, char** argv)
 {
+	/*
 	GameEngine.Initialize(argc, argv);
-
-	Mouse.HideCursor();
-
-	cam1.SetPosition(-5, 10, 10);
-	cam1.LookAt(vec3(0, 0, 0));
+	
+	cam1.SetPosition(-5.0, 10.0, 10.0);
+	cam1.LookAt(0, 0, 0);
 	cam1.SetAspectRatio(Window.GetRatio());
+	
+	box1.pos = vec3(5.0, 0.5,-1.5);
+	box2.pos = vec3(5.0, 0.5, 0.0);
+	box3.pos = vec3(5.0, 0.5, 1.5);
+
 	grid.SetDimensions(10, 10);
+	*/
+	int i = 0;
+	double angle = 0;
 	
-	server.Open(31415);
-	sock.Open(31416);
+	double s = 0;
+	double c = 0;
+
+	const int n = 360 * 100000;
+
+	real t0, t1, t2, t3;
 	
-	cout << Network.GetHostAddress() << endl;
+	t0 = Clock.GetRunTime(); for(int i = 0; i < n; i++) { angle = rad(i); clibrary(angle, s, c); } t1 = Clock.GetRunTime() - t0;
+	t0 = Clock.GetRunTime(); for(int i = 0; i < n; i++) { angle = rad(i); tangcon(angle, s, c); }  t2 = Clock.GetRunTime() - t0;
+	t0 = Clock.GetRunTime(); for(int i = 0; i < n; i++) { angle = rad(i); trigid(angle, s, c); }   t3 = Clock.GetRunTime() - t0;
+
+	cout << "clib: " << t1 << endl;
+	cout << "tang: " << t2 << endl;
+	cout << "trig: " << t3 << endl;
+	cout << endl;
+
+	t0 = Clock.GetRunTime(); for(int i = 0; i < n; i++) { angle = rad(i); tangcon(angle, s, c); }  t2 = Clock.GetRunTime() - t0;
+	t0 = Clock.GetRunTime(); for(int i = 0; i < n; i++) { angle = rad(i); trigid(angle, s, c); }   t3 = Clock.GetRunTime() - t0;
+	t0 = Clock.GetRunTime(); for(int i = 0; i < n; i++) { angle = rad(i); clibrary(angle, s, c); } t1 = Clock.GetRunTime() - t0;
+
+	cout << "clib: " << t1 << endl;
+	cout << "tang: " << t2 << endl;
+	cout << "trig: " << t3 << endl;
+	cout << endl;
 	
-	GameEngine.Start();
-	
+	t0 = Clock.GetRunTime(); for(int i = 0; i < n; i++) { angle = rad(i); trigid(angle, s, c); }   t3 = Clock.GetRunTime() - t0;
+	t0 = Clock.GetRunTime(); for(int i = 0; i < n; i++) { angle = rad(i); clibrary(angle, s, c); } t1 = Clock.GetRunTime() - t0;
+	t0 = Clock.GetRunTime(); for(int i = 0; i < n; i++) { angle = rad(i); tangcon(angle, s, c); }  t2 = Clock.GetRunTime() - t0;
+
+	cout << "clib: " << t1 << endl;
+	cout << "tang: " << t2 << endl;
+	cout << "trig: " << t3 << endl;
+	cout << endl;
+
+	// GameEngine.Start();
+
 	#ifdef OS_WINDOWS 
 		system("PAUSE");
 	#endif
@@ -50,68 +104,59 @@ int main(int argc, char** argv)
 
 void CGameEngine::Render(void) const
 {
+	// reset
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glLoadIdentity();	
 	
 	cam1.SetActive();
 
-	Color::GetColor(CHARTREUSE).Bind();
-	for(uint i = 0; i < boxes.size(); i++)
-	{
-		boxes[i].Render();
-	}
+	// boxes
+	Color::GetColor(GREEN).Bind();
+	box1.Render();
 
+	Color::GetColor(ORANGE).Bind();
+	box2.Render();
+	
+	Color::GetColor(PURPLE).Bind();
+	box3.Render();
+
+	// grid
 	Color::GetColor(WHITE).Bind();
 	grid.Render();
 
+	// swap buffers
 	glutSwapBuffers();
 }
 
 void CGameEngine::Idle(void) const
 {
-	server.Update();
+	real k = 10.0;
+	real b = 1.0;
 
-	char data[4096];
-	Address sender;
+	box1.f = - k * (box1.pos - vec3(0, box1.pos.y, box1.pos.z)) - b * box1.vel;
+	box2.f = - k * (box2.pos - vec3(0, box2.pos.y, box2.pos.z)) - b * box2.vel;
+	box3.f = - k * (box3.pos - vec3(0, box3.pos.y, box3.pos.z)) - b * box3.vel;
 
-	int recv = sock.Receive(sender, data, sizeof(data));
+	real dt = Clock.GetTimeDelta();
 
-	if(recv > 0)
-	{
-		uint num;
-		memcpy(&num, data, sizeof(num));
-				
-		for(uint i = 0; i < num; i++)
-		{
-			Object3 obj;
-
-			if(boxes.size() < num)
-			{
-				boxes.push_back(Box3());
-			}
-			
-			memcpy(&obj, data + sizeof(num) + i * sizeof(obj), sizeof(obj));
-			
-			boxes[i].SetPosition(obj.GetPosition());
-			boxes[i].SetRotation(obj.GetRotation());
-		}
-	}
+	Integrator.RK4((Object&)box1, dt);
+	Integrator.Euler((Object&)box2, dt);
+	Integrator.Newton((Object&)box3, dt);
 }
 
 void CGameEngine::Input(void) const
 {
-	Package pack;
+	real mov = Clock.GetTimeDelta() * 10;
+	real rot = Clock.GetTimeDelta() * 250;
 	
-	if(Keyboard.KeyIsPressed('w')) pack.w = true;
-	if(Keyboard.KeyIsPressed('a')) pack.a = true;
-	if(Keyboard.KeyIsPressed('s')) pack.s = true;
-	if(Keyboard.KeyIsPressed('d')) pack.d = true;
+	static real s = 1.0;
 
-	pack.dx = Mouse.PositionDelta().x * 0.5;
-	Mouse.Center();
+	if(Keyboard.KeyIsPressed('w')) { s+= 0.001; Clock.SetTimescale(s); }
+	if(Keyboard.KeyIsPressed('s')) { s-= 0.001; Clock.SetTimescale(s); }
 
-	Address server("192.168.2.103", 31415);
-	sock.Send(server, &pack, sizeof(pack));
+	if(Keyboard.KeyIsPressed('x')) box3.rot *= quat::WithRotationAboutX(rot);
+	if(Keyboard.KeyIsPressed('y')) box3.rot *= quat::WithRotationAboutY(rot);
+	if(Keyboard.KeyIsPressed('z')) box3.rot *= quat::WithRotationAboutZ(rot);
 
 	if(Keyboard.KeyWasPressed('f')) Window.SetFullScreen();
 	if(Keyboard.KeyWasPressed('r')) Window.Reset();

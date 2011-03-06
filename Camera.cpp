@@ -37,12 +37,9 @@ Camera::Camera(const vec3& position, const quat& rotation) : Object3(position, r
 
 void Camera::UpdateView(void) const
 {
-	real w;
-	vec3 n;
+	AxisAngle a = rot.GetAxisAngle();
 
-	rot.GetAxisAngle(n, w);
-
-	glRotatef(-w, n.x, n.y, n.z);
+	glRotatef(-a.angle, a.axis.x, a.axis.y, a.axis.z);
 	glTranslatef(-pos.x, -pos.y, -pos.z);
 }
 

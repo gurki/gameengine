@@ -8,13 +8,14 @@
 #include "Box3.h"
 #include "OpenGL.h"
 
-Box3::Box3(void) : Object3()
+Box3::Box3(void) : Object()
 {
 	dim = vec3::One();
 }
 
-Box3::Box3(const vec3& position, const quat& rotation, const vec3& dimensions) : Object3(position, rotation)
+Box3::Box3(const vec3& position, const vec3& dimensions) : Object()
 {
+	pos = position;
 	dim = dimensions;
 }
 
@@ -29,16 +30,12 @@ void Box3::Render(void)
 	real z0 = - dim.z / 2.0;
 	real z1 = - z0;
 
-	vec3 axis;
-	real angle;
-
-	rot.GetAxisAngle(axis, angle);
+	AxisAngle a = rot.GetAxisAngle();
 
 	glPushMatrix();
 
 	glTranslatef(pos.x, pos.y, pos.z);
-
-	glRotatef(angle, axis.x, axis.y, axis.z);
+	glRotatef(a.angle, a.axis.x, a.axis.y, a.axis.z);
 
 	glBegin(GL_TRIANGLE_STRIP);
 

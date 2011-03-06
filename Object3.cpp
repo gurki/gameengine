@@ -26,7 +26,7 @@ Object3::Object3(const vec3& position, const quat& rotation)
 Object3::Object3(real x, real y, real z, real yaw, real pitch, real roll)
 {
 	pos = vec3(x, y, z);
-	rot = quat(yaw, pitch, roll);
+	rot = Quaternion::WithEulerAngles(yaw, pitch, roll);
 }
 
 //***************************************************************************//
@@ -60,7 +60,7 @@ void Object3::LookAt(const vec3& point)
 	real s = deg(atan2r(d.x, d.z)) + 180;
 	real t = deg(asinr(d.y / d.Magnitude()));
 
-	rot = quat(s, t, 0);
+	rot = Quaternion::WithEulerAngles(s, t, 0);
 }
 
 void Object3::LookAt(real x, real y, real z)
@@ -72,17 +72,17 @@ void Object3::LookAt(real x, real y, real z)
 	real s = deg(atan2r(d.x, d.z)) + 180;
 	real t = deg(asinr(d.y / d.Magnitude()));
 
-	rot = quat(s, t, 0);
+	rot = Quaternion::WithEulerAngles(s, t, 0);
 }
 
-void Object3::Rotate(const vec3& direction)
+void Object3::Rotate(const vec3& axis, real angle)
 {
-	rot *= quat(direction);
+	rot *= Quaternion::WithAxisAngle(axis, angle);
 }
 
 void Object3::Rotate(real yaw, real pitch, real roll)
 {
-	rot *= quat(yaw, pitch, roll);
+	rot *= Quaternion::WithEulerAngles(yaw, pitch, roll);
 }
 
 //***************************************************************************//
@@ -106,7 +106,7 @@ void Object3::SetRotation(const quat& rotation)
 
 void Object3::SetRotation(real yaw, real pitch, real roll)
 {
-	rot = quat(yaw, pitch, roll);
+	rot = Quaternion::WithEulerAngles(yaw, pitch, roll);
 }
 
 //***************************************************************************//

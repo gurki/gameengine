@@ -13,46 +13,26 @@
 
 Quaternion::Quaternion(void)
 {
-	for(uint n = 0; n < 4; n++)
-	{
-		v[n] = 0;
-	}
+	w = 0;
+	x = 0;
+	y = 0;
+	z = 0;
 }
 
 Quaternion::Quaternion(const real* v)
 {
-	for(uint n = 0; n < 4; n++)
-	{
-		this->v[n] = v[n];
-	}
+	w = v[0];
+	x = v[1];
+	y = v[2];
+	z = v[3];
 }
 
-Quaternion::Quaternion(real x, real y, real z, real w)
+Quaternion::Quaternion(real w, real x, real y, real z)
 {
-	v[0] = x;
-	v[1] = y;
-	v[2] = z;
-	v[3] = w;
-}
-
-Quaternion::Quaternion(const vec3& axis, real angle)
-{
-	SetFromAxisAngle(axis, angle);
-}
-
-Quaternion::Quaternion(real yaw, real pitch, real roll)
-{
-	SetFromEulerAngles(yaw, pitch, roll);
-}
-
-Quaternion::Quaternion(const vec3& from, const vec3& to)
-{
-	SetFromDirections(from, to);
-}
-
-Quaternion::Quaternion(const vec3& to)
-{
-	SetFromDirection(to);
+	this->w = w;
+	this->x = x;
+	this->y = y;
+	this->z = z;
 }
 
 //***************************************************************************//
@@ -61,165 +41,273 @@ Quaternion::Quaternion(const vec3& to)
 		 
 void Quaternion::operator = (const Quaternion& quat)
 {
+	w = quat.w;
 	x = quat.x;
 	y = quat.y;
 	z = quat.z;
-	w = quat.w;
 }
 
-bool Quaternion::operator == (const Quaternion& quat) const
+bool Quaternion::operator == (const Quaternion& q) const
 {
-	for(uint n = 0; n < 4; n++)
-	{
-		if(quat.v[n] != v[n])
-		{
-			return false;
-		}
-	}
-			
-	return true;
+	return w == q.w && x == q.x && y == q.y && z == q.z;
 }
 
-bool Quaternion::operator != (const Quaternion& quat) const
+bool Quaternion::operator != (const Quaternion& q) const
 {
-	for(uint n = 0; n < 4; n++)
-	{
-		if(quat.v[n] == v[n])
-		{
-			return false;
-		}
-	}
-			
-	return true;
+	return w != q.w || x != q.x || y != q.y || z != q.z;
 }
 
 //***************************************************************************//
 //                                                                           //
 //***************************************************************************//
 
-Quaternion Quaternion::operator * (const Quaternion& quat) const
+Quaternion Quaternion::operator * (real n) const
 {
-	return Quaternion(w * quat.x + x * quat.w + y * quat.z - z * quat.y,
-					  w * quat.y - x * quat.z + y * quat.w + z * quat.x,
-					  w * quat.z + x * quat.y - y * quat.x + z * quat.w,
-					  w * quat.w - x * quat.x - y * quat.y - z * quat.z);
+	Quaternion q;
+
+	q.w = w * n;
+	q.x = x * n;
+	q.y = y * n;
+	q.z = z * n;
+
+	return q;
 }
+
+Quaternion Quaternion::operator / (real n) const
+{
+	Quaternion q;
+
+	q.w = w / n;
+	q.x = x / n;
+	q.y = y / n;
+	q.z = z / n;
+
+	return q;
+}
+
+Quaternion& Quaternion::operator *= (real n)
+{
+	w *= n;
+	x *= n;
+	y *= n;
+	z *= n;
+
+	return *this;
+}
+
+Quaternion& Quaternion::operator /= (real n)
+{
+	w /= n;
+	x /= n;
+	y /= n;
+	z /= n;
+
+	return *this;
+}
+
+Quaternion operator * (real n, const Quaternion& quat)
+{
+	Quaternion q;
+
+	q.w = quat.w * n;
+	q.x = quat.x * n;
+	q.y = quat.y * n;
+	q.z = quat.z * n;
+
+	return q;
+}
+
+//***************************************************************************//
+//                                                                           //
+//***************************************************************************//
 
 vec3 Quaternion::operator * (const vec3& vec) const
 {
 	Quaternion vecQuat, resQuat;
 
+	vecQuat.w = 0.0f;
 	vecQuat.x = vec.x;
 	vecQuat.y = vec.y;
 	vecQuat.z = vec.z;
-	vecQuat.w = 0.0f;
  
 	resQuat = ((*this) * vecQuat) * Conjugated();
  
 	return vec3(resQuat.x, resQuat.y, resQuat.z);
 }
 
-vec3 operator * (const vec3& vec, const Quaternion& quat)
+vec3 operator * (const vec3& vec, const Quaternion& q)
 {
 	Quaternion vecQuat, resQuat;
 
+	vecQuat.w = 0.0f;
 	vecQuat.x = vec.x;
 	vecQuat.y = vec.y;
 	vecQuat.z = vec.z;
-	vecQuat.w = 0.0f;
 
-	resQuat = (quat * vecQuat) * quat.Conjugated();
+	resQuat = (q * vecQuat) * q.Conjugated();
  
 	return vec3(resQuat.x, resQuat.y, resQuat.z);
-}
-
-void Quaternion::operator *= (const Quaternion& quat)
-{
-    real q0 = w * quat.x + x * quat.w + y * quat.z - z * quat.y;
-    real q1 = w * quat.y - x * quat.z + y * quat.w + z * quat.x;
-    real q2 = w * quat.z + x * quat.y - y * quat.x + z * quat.w;
-    real q3 = w * quat.w - x * quat.x - y * quat.y - z * quat.z;
-
-	x = q0;
-	y = q1;
-	z = q2;
-	w = q3;
 }
 
 //***************************************************************************//
 //                                                                           //
 //***************************************************************************//
 
-void Quaternion::Normalise(void)
+Quaternion Quaternion::operator + (const Quaternion& quat) const
 {
-	real n = x * x + y * y + z * z + w * w;
+	Quaternion q;
+
+	q.w = w + quat.w;
+	q.x = x + quat.x;
+	q.y = y + quat.y;
+	q.z = z + quat.z;
+			
+	return q;
+}
+
+Quaternion Quaternion::operator - (const Quaternion& quat) const
+{
+	Quaternion q;
+
+	q.w = w - quat.w;
+	q.x = x - quat.x;
+	q.y = y - quat.y;
+	q.z = z - quat.z;
+					
+	return q;
+}
+
+Quaternion Quaternion::operator * (const Quaternion& quat) const
+{
+	Quaternion q;
+
+	q.w = w * quat.w - x * quat.x - y * quat.y - z * quat.z;
+	q.x = w * quat.x + x * quat.w + y * quat.z - z * quat.y;
+	q.y = w * quat.y - x * quat.z + y * quat.w + z * quat.x;
+	q.z = w * quat.z + x * quat.y - y * quat.x + z * quat.w;
+	
+	q.Normalise();
+	
+	return q;
+}
+
+Quaternion& Quaternion::operator += (const Quaternion& quat)
+{
+	w += quat.w;
+	x += quat.x;
+	y += quat.y;
+	z += quat.z;
+
+	return *this;
+}
+
+Quaternion& Quaternion::operator -= (const Quaternion& quat)
+{
+	w -= quat.w;
+	x -= quat.x;
+	y -= quat.y;
+	z -= quat.z;
+		
+	return *this;
+}
+
+Quaternion& Quaternion::operator *= (const Quaternion& quat)
+{
+	w = w * quat.w - x * quat.x - y * quat.y - z * quat.z;
+   	x = w * quat.x + x * quat.w + y * quat.z - z * quat.y;
+	y = w * quat.y - x * quat.z + y * quat.w + z * quat.x;
+	z = w * quat.z + x * quat.y - y * quat.x + z * quat.w;
+
+	Normalise();
+
+	return *this;
+}
+
+//***************************************************************************//
+//                                                                           //
+//***************************************************************************//
+
+Quaternion& Quaternion::Normalise(void)
+{
+	real n = w * w + x * x + y * y + z * z;
 
 	if(n == 0.0 || n == 1.0)
 	{
-		return;
+		return * this;
 	}
 
 	n = sqrtr(n);
 
+	w /= n;
 	x /= n;
 	y /= n;
 	z /= n;
-	w /= n;
+
+	return *this;
 }
 
 Quaternion Quaternion::Normalised(void) const
 {
-	real n = x * x + y * y + z * z + w * w;
+	real n = w * w + x * x + y * y + z * z;
 
 	if(n == 0.0 || n == 1.0)
 	{
 		return *this;
 	}
 
-	Quaternion quat = *this;
+	Quaternion q = *this;
 
 	n = sqrtr(n);
 
-	quat.x /= n;
-	quat.y /= n;
-	quat.z /= n;
-	quat.w /= n;
+	q.w /= n;
+	q.x /= n;
+	q.y /= n;
+	q.z /= n;
 
-	return quat;
+	return q;
 }
 
-void Quaternion::Conjugate(void)
+Quaternion& Quaternion::Conjugate(void)
 {
 	x = -x;
 	y = -y;
 	z = -z;
+
+	return *this;
 }
 
 Quaternion Quaternion::Conjugated(void) const
 {
-	return Quaternion(-x,-y,-z, w);
+	return Quaternion(w, -x,-y,-z);
 }
 
 //***************************************************************************//
 //                                                                           //
 //***************************************************************************//
 
-void Quaternion::SetFromAxisAngle(const vec3& axis, real angle)
+Quaternion Quaternion::WithAxisAngle(const vec3& axis, real angle)
 {
+	Quaternion q;
+
 	real a = 0.5f * rad(angle);
 	real s = sinr(a);
 	
-	vec3 v = axis; 
+	vec3 v = axis;
+
 	v.Normalise();
 
-	x = v.x * s;
-	y = v.y * s;
-	z = v.z * s;
-	w = cosr(a);
+	q.w = cosr(a);
+	q.x = v.x * s;
+	q.y = v.y * s;
+	q.z = v.z * s;
+
+	return q;
 }
 
-void Quaternion::SetFromEulerAngles(real yaw, real pitch, real roll)
+Quaternion Quaternion::WithEulerAngles(real yaw, real pitch, real roll)
 {
+	Quaternion q;
+
 	real y = 0.5f * rad(yaw);
 	real r = 0.5f * rad(roll);
 	real p = 0.5f * rad(pitch);
@@ -232,122 +320,167 @@ void Quaternion::SetFromEulerAngles(real yaw, real pitch, real roll)
 	real cosr = cosr(r);
 	real cosp = cosr(p);
 
-	this->x = siny * sinr * cosp + cosy * cosr * sinp;
-	this->y = siny * cosr * cosp + cosy * sinr * sinp;
-	this->z = cosy * sinr * cosp - siny * cosr * sinp;
-	this->w = cosy * cosr * cosp - siny * sinr * sinp;
+	q.w = cosy * cosr * cosp - siny * sinr * sinp;
+	q.x = siny * sinr * cosp + cosy * cosr * sinp;
+	q.y = siny * cosr * cosp + cosy * sinr * sinp;
+	q.z = cosy * sinr * cosp - siny * cosr * sinp;
+
+	return q;
 }
 
-void Quaternion::SetFromDirections(const vec3& from, const vec3& to)
+Quaternion Quaternion::WithFromToOrientations(const vec3& from, const vec3& to)
 {
+	Quaternion q;
+
 	vec3 f = from;
-	f.Normalise();
-
 	vec3 t = to;
+
+	f.Normalise();
 	t.Normalise();
 
 	vec3 n = t.Cross(f);
-	w = 0.5f * t.Dot(f);
-	real s = sinr(acosr(w));
 
-	x = n.x * s;
-	y = n.y * s;
-	z = n.z * s;
+	q.w = 0.5f * t.Dot(f);
+
+	real s = sinr(acosr(q.w));
+
+	q.x = n.x * s;
+	q.y = n.y * s;
+	q.z = n.z * s;
+
+	return q;
 }
 
-void Quaternion::SetFromDirection(const vec3& to)
+Quaternion Quaternion::WithOrientation(const vec3& orientation)
 {
-	vec3 f = vec3::Forward();
+	Quaternion q;
 
-	vec3 t = to;
+	vec3 f = vec3::Forward();
+	vec3 t = orientation;
+
 	t.Normalise();
 
 	vec3 n = t.Cross(f);
-	w = 0.5f * t.Dot(f);
-	real s = sinr(acosr(w));
 
-	x = n.x * s;
-	y = n.y * s;
-	z = n.z * s;
+	q.w = 0.5f * t.Dot(f);
+
+	real s = sinr(acosr(q.w));
+
+	q.x = n.x * s;
+	q.y = n.y * s;
+	q.z = n.z * s;
+
+	return q;
+}
+
+Quaternion Quaternion::WithRotationAboutX(real angle)
+{
+	Quaternion q;
+
+	real w = 0.5f * rad(angle);
+	
+	q.w = cosr(w);
+	q.x = sinr(w);
+	q.y = 0.0;
+	q.z = 0.0;
+
+	return q;
+}
+
+Quaternion Quaternion::WithRotationAboutY(real angle)
+{
+	Quaternion q;
+
+	real w = 0.5f * rad(angle);
+
+	q.w = cosr(w);
+	q.x = 0.0;
+	q.y = sinr(w);
+	q.z = 0.0;
+
+	return q;
+}
+
+Quaternion Quaternion::WithRotationAboutZ(real angle)
+{
+	Quaternion q;
+
+	real w = 0.5f * rad(angle);
+
+	q.w = cosr(w);
+	q.x = 0.0;
+	q.y = 0.0;
+	q.z = sinr(w);
+
+	return q;
 }
 
 //***************************************************************************//
 //                                                                           //
 //***************************************************************************//
 
-vec3 Quaternion::GetDirection(void) const
+vec3 Quaternion::GetOrientation(void) const
 {
 	return (*this) * vec3::Forward();
 }
 
-vec3 Quaternion::GetAxis(void) const
+AxisAngle Quaternion::GetAxisAngle(void) const
 {
-	return vec3(x, y,z).Normalise();
+	AxisAngle axisangle;
+
+	axisangle.axis = vec3(x, y, z);
+	axisangle.angle = deg(acosr(w) * 2.0f);
+
+	return axisangle;
 }
 
-real Quaternion::GetAngle(void) const
+EulerAngles Quaternion::GetEulerAngles(void) const
 {
-	return deg(acosr(w) * 2.0f);
-}
+	EulerAngles eulerangles;
 
-real Quaternion::GetYaw(void) const
-{
-	return atan2r(2.0 * (w * x + y * z), 1.0 - 2.0 * (z * z + x * x));
-}
-
-real Quaternion::GetPitch(void) const
-{
-	return asinr(2.0 * (w * z - y * x));
-}
-
-real Quaternion::GetRoll(void) const
-{
-	return atan2r(2.0 * (w * y + z * x), 1.0 - 2.0 * (y * y + z * z));
-}
-
-void Quaternion::GetAxisAngle(vec3& axis, real& angle) const
-{
-	axis = vec3(x, y, z);
-	angle = deg(acosr(w) * 2.0f);
-}
-
-void Quaternion::GetEulerAngles(real& yaw, real& pitch, real& roll) const
-{
-	yaw = deg(atan2r(2.0 * (w * x + y * z), 1.0 - 2.0 * (z * z + x * x)));
-	pitch = deg(asinr(2.0 * (w * z - y * x)));
-	roll = deg(atan2r(2.0 * (w * y + z * x), 1.0 - 2.0 * (y * y + z * z)));
+	eulerangles.yaw = deg(atan2r(2.0 * (w * x + y * z), 1.0 - 2.0 * (z * z + x * x)));
+	eulerangles.pitch = deg(asinr(2.0 * (w * z - y * x)));
+	eulerangles.roll = deg(atan2r(2.0 * (w * y + z * x), 1.0 - 2.0 * (y * y + z * z)));
+	
+	return eulerangles;
 }
 
 //***************************************************************************//
 //                                                                           //
 //***************************************************************************//
 
-ostream& operator << (ostream& out, const Quaternion& quat)
+ostream& operator << (ostream& out, const Quaternion& q)
 {
-	out << "{" << quat.x << ", " << quat.y << ", " << quat.z << ", " << quat.w << "}";
+	out << "{" << q.w << ", (" << q.x << ", " << q.y << ", " << q.z << ")}";
 
 	return out;
 }
 
-istream& operator >> (istream& in, Quaternion& quat)
+istream& operator >> (istream& in, Quaternion& q)
 {
-	real x, y, z, w;
+	real w, x, y, z;
 
-	in >> x >> y >> z >> w;
+	in >> w >> x >> y >> z;
 
-	quat = Quaternion(x, y, z, w);
+	q = Quaternion(w, x, y, z);
+
+	q.Normalise();
 
 	return in;
 }
 
+//***************************************************************************//
+//                                                                           //
+//***************************************************************************//
+
 const Quaternion Quaternion::Zero(void)
 {
-	static const Quaternion quat(0, 0, 0, 0);
-	return quat;
+	static const Quaternion q(0, 0, 0, 0);
+	return q;
 }
 
 const Quaternion Quaternion::Identity(void)
 {
-	static const Quaternion quat(0, 0, 0, 1);
-	return quat;
+	static const Quaternion q(1, 0, 0, 0);
+	return q;
 }

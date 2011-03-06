@@ -23,12 +23,15 @@ class CTimer
 
 		real GetFrameRate(void) const;
 
+		void SetTimescale(real scale);
+
 	private:
 
 		real last;
 		real frame;
 
 		real fps;
+		real scale;
 
 	public:
 

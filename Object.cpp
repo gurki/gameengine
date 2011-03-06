@@ -5,23 +5,19 @@
 //                                                                           //
 //***************************************************************************//
 
-#ifndef _BOX3_H
-#define _BOX3_H
-
 #include "Object.h"
 
-class Box3 : public Object
+Object::Object(void)
 {
-	public:
+	pos = vec3::Zero();
+	vel = vec3::Zero();
 
-		Box3(void);
-		Box3(const vec3& position, const vec3& dimensions);
+	f = vec3::Zero();
+	invm = 1.0;
+	
+	rot = quat::Identity();
+	ang = quat::Zero();
 
-		void Render(void);
-
-	protected:
-
-		vec3 dim;
-};
-
-#endif
+	t = vec3::Zero();
+	invi = 1.0;
+}

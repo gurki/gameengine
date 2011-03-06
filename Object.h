@@ -5,23 +5,32 @@
 //                                                                           //
 //***************************************************************************//
 
-#ifndef _BOX3_H
-#define _BOX3_H
+#ifndef _OBJECT_H
+#define _OBJECT_H
 
-#include "Object.h"
+#include "Types.h"
+#include "Vector3.h"
+#include "Quaternion.h"
 
-class Box3 : public Object
+class Object
 {
 	public:
 
-		Box3(void);
-		Box3(const vec3& position, const vec3& dimensions);
+		Object(void);
 
-		void Render(void);
+	// protected:
 
-	protected:
+		vec3 pos;
+		vec3 vel;
 
-		vec3 dim;
+		vec3 f;
+		real invm;
+	
+		quat rot;
+		quat ang;
+
+		vec3 t;
+		real invi;
 };
 
 #endif
