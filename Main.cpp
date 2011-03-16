@@ -12,88 +12,35 @@
 #include "Window.h"
 #include "Camera.h"
 #include "Integrator.h"
+#include "Particle.h"
+#include "Matrix3x3.h"
 
 using namespace std;
 
+#define n 6
+
 Camera cam1;
 Grid3 grid;
-Box3 box1, box2, box3;
-
-void clibrary(const double angle, double& s, double& c)
-{
-	s = sin(angle);
-	c = cos(angle);
-}
-
-void tangcon(const double angle, double& s, double& c)
-{
-	double z = tan(angle * 0.5);
-
-	s = 2 * z / (1 + z * z);
-	c = (1 - z * z) / (1 + z * z);
-}
-
-void trigid(const double angle, double& s, double& c)
-{
-	int sign = (angle - C_PIDIV2 < C_PI ? 1 : -1);
-
-	s = sin(angle);
-	c = sqrt(1 - s * s);
-}
+Box3 box;
+Particle p[n];
 
 int main(int argc, char** argv)
 {
-	/*
 	GameEngine.Initialize(argc, argv);
 	
-	cam1.SetPosition(-5.0, 10.0, 10.0);
+	cam1.SetPosition(-5.0, 20.0, 20.0);
 	cam1.LookAt(0, 0, 0);
 	cam1.SetAspectRatio(Window.GetRatio());
 	
-	box1.pos = vec3(5.0, 0.5,-1.5);
-	box2.pos = vec3(5.0, 0.5, 0.0);
-	box3.pos = vec3(5.0, 0.5, 1.5);
-
+	for(uint i = 0; i < n; i++)
+	{
+		real d = (i - n/2.0) * 10 / n;
+		p[i].SetPosition( vec3(sin(d) * d, d, cos(d) * d) );
+	}
+	
 	grid.SetDimensions(10, 10);
-	*/
-	int i = 0;
-	double angle = 0;
-	
-	double s = 0;
-	double c = 0;
 
-	const int n = 360 * 100000;
-
-	real t0, t1, t2, t3;
-	
-	t0 = Clock.GetRunTime(); for(int i = 0; i < n; i++) { angle = rad(i); clibrary(angle, s, c); } t1 = Clock.GetRunTime() - t0;
-	t0 = Clock.GetRunTime(); for(int i = 0; i < n; i++) { angle = rad(i); tangcon(angle, s, c); }  t2 = Clock.GetRunTime() - t0;
-	t0 = Clock.GetRunTime(); for(int i = 0; i < n; i++) { angle = rad(i); trigid(angle, s, c); }   t3 = Clock.GetRunTime() - t0;
-
-	cout << "clib: " << t1 << endl;
-	cout << "tang: " << t2 << endl;
-	cout << "trig: " << t3 << endl;
-	cout << endl;
-
-	t0 = Clock.GetRunTime(); for(int i = 0; i < n; i++) { angle = rad(i); tangcon(angle, s, c); }  t2 = Clock.GetRunTime() - t0;
-	t0 = Clock.GetRunTime(); for(int i = 0; i < n; i++) { angle = rad(i); trigid(angle, s, c); }   t3 = Clock.GetRunTime() - t0;
-	t0 = Clock.GetRunTime(); for(int i = 0; i < n; i++) { angle = rad(i); clibrary(angle, s, c); } t1 = Clock.GetRunTime() - t0;
-
-	cout << "clib: " << t1 << endl;
-	cout << "tang: " << t2 << endl;
-	cout << "trig: " << t3 << endl;
-	cout << endl;
-	
-	t0 = Clock.GetRunTime(); for(int i = 0; i < n; i++) { angle = rad(i); trigid(angle, s, c); }   t3 = Clock.GetRunTime() - t0;
-	t0 = Clock.GetRunTime(); for(int i = 0; i < n; i++) { angle = rad(i); clibrary(angle, s, c); } t1 = Clock.GetRunTime() - t0;
-	t0 = Clock.GetRunTime(); for(int i = 0; i < n; i++) { angle = rad(i); tangcon(angle, s, c); }  t2 = Clock.GetRunTime() - t0;
-
-	cout << "clib: " << t1 << endl;
-	cout << "tang: " << t2 << endl;
-	cout << "trig: " << t3 << endl;
-	cout << endl;
-
-	// GameEngine.Start();
+	GameEngine.Start();
 
 	#ifdef OS_WINDOWS 
 		system("PAUSE");
@@ -110,15 +57,16 @@ void CGameEngine::Render(void) const
 	
 	cam1.SetActive();
 
+	Color c;
 	// boxes
-	Color::GetColor(GREEN).Bind();
-	box1.Render();
+	for(uint i = 0; i < n; i++)
+	{
+		c.SetHLS((real)i / (real)n, 0.5, 1.0);
+		c.Bind();
 
-	Color::GetColor(ORANGE).Bind();
-	box2.Render();
-	
-	Color::GetColor(PURPLE).Bind();
-	box3.Render();
+		box.SetPosition(p[i].GetPosition());
+		box.Render();
+	}
 
 	// grid
 	Color::GetColor(WHITE).Bind();
@@ -130,33 +78,72 @@ void CGameEngine::Render(void) const
 
 void CGameEngine::Idle(void) const
 {
-	real k = 10.0;
-	real b = 1.0;
-
-	box1.f = - k * (box1.pos - vec3(0, box1.pos.y, box1.pos.z)) - b * box1.vel;
-	box2.f = - k * (box2.pos - vec3(0, box2.pos.y, box2.pos.z)) - b * box2.vel;
-	box3.f = - k * (box3.pos - vec3(0, box3.pos.y, box3.pos.z)) - b * box3.vel;
-
+	const real ts = 0.01;
+	static real t = 0;
 	real dt = Clock.GetTimeDelta();
 
-	Integrator.RK4((Object&)box1, dt);
-	Integrator.Euler((Object&)box2, dt);
-	Integrator.Newton((Object&)box3, dt);
+	t += dt;
+
+	real k = 10.0;
+	real b = 0.1;
+
+	while(abs(t) > ts)
+	{
+		for(uint i = 0; i < n; i++)
+		{
+			vec3 pos = p[(i+1)%n].GetPosition();
+			vec3 f = - k * (p[i].GetPosition() - pos) - b * p[i].GetVelocity();
+
+			p[i].AddForce(f);
+			p[(i+1)%n].AddForce(-f);
+			
+			// p[i].AddForce( vec3(0.0, -9.81 * p[i].GetMass(), 0.0) );
+		}
+	
+		for(uint i = 0; i < n; i++)
+		{
+			Integrator.SymplecticEuler1(p[i], sign(dt) * ts);
+		}
+
+		for(uint i = 0; i < n; i++)
+		{
+			p[i].ClearForces();
+		}
+/*
+		for(uint i = 0; i < n; i++)
+		{
+			vec3 pos = p[i].GetPosition();
+
+			if(pos.y <= 0.0)
+			{
+				vec3 vel = p[i].GetVelocity();
+
+				p[i].SetVelocity( vec3(vel.x, -vel.y, vel.z) );
+			}
+		}
+*/
+		t -= sign(dt) * ts;
+	}
 }
 
 void CGameEngine::Input(void) const
 {
-	real mov = Clock.GetTimeDelta() * 10;
-	real rot = Clock.GetTimeDelta() * 250;
+	// real mov = Clock.GetTimeDelta() * 10;
+	// real rot = Clock.GetTimeDelta() * 250;
 	
 	static real s = 1.0;
 
-	if(Keyboard.KeyIsPressed('w')) { s+= 0.001; Clock.SetTimescale(s); }
-	if(Keyboard.KeyIsPressed('s')) { s-= 0.001; Clock.SetTimescale(s); }
+	if(Keyboard.KeyIsPressed('w')) { s = sup(s + 0.001, 2); Clock.SetTimescale(s); cout << s << endl; }
+	if(Keyboard.KeyIsPressed('s')) { s = inf(s - 0.001,-2); Clock.SetTimescale(s); cout << s << endl; }
+	
+	if(Keyboard.KeyIsPressed('d')) { s = sup(s + 0.01, 2); Clock.SetTimescale(s); cout << s << endl; }
+	if(Keyboard.KeyIsPressed('a')) { s = inf(s - 0.01,-2); Clock.SetTimescale(s); cout << s << endl; }
 
-	if(Keyboard.KeyIsPressed('x')) box3.rot *= quat::WithRotationAboutX(rot);
-	if(Keyboard.KeyIsPressed('y')) box3.rot *= quat::WithRotationAboutY(rot);
-	if(Keyboard.KeyIsPressed('z')) box3.rot *= quat::WithRotationAboutZ(rot);
+	if(Keyboard.KeyIsPressed('e')) { s = 1; Clock.SetTimescale(s); cout << s << endl; }
+	if(Keyboard.KeyIsPressed('q')) { s =-1; Clock.SetTimescale(s); cout << s << endl; }
+
+	if(Keyboard.KeyWasPressed('p')) GameEngine.Pause();
+	if(Keyboard.KeyWasPressed('u')) GameEngine.Unpause();
 
 	if(Keyboard.KeyWasPressed('f')) Window.SetFullScreen();
 	if(Keyboard.KeyWasPressed('r')) Window.Reset();

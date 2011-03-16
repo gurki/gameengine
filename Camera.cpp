@@ -95,7 +95,7 @@ void Camera::SetOrthographic(void)
 
 void Camera::SetFieldOfView(real fovy)
 {
-	this->fovy = stick(fovy, 1);
+	this->fovy = inf(fovy, 1);
 	
 	UpdateViewport();
 }
@@ -109,7 +109,7 @@ void Camera::SetAspectRatio(real ratio)
 
 void Camera::SetNearFar(real near, real far)
 {
-	this->far = stick(far, 0);
+	this->far = inf(far, 0);
 	this->near = limit(near, 0, far);
 	
 	UpdateViewport();

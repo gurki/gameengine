@@ -7,40 +7,82 @@
 
 #include "Integrator.h"
 
-Derivative CIntegrator::f(const Object& obj, real dt, const Derivative& d)
+Derivative CIntegrator::f(const Particle& p, real dt, const Derivative& d)
 {	
 	Derivative out;
 
-    out.dp = obj.vel + d.dv * dt;
-    out.dv = obj.f * obj.invm;
+    out.dp = p.GetVelocity() + d.dv * dt;
+    out.dv = p.GetForce() * p.GetInverseMass();
 
 	return out;
 }
 
-void CIntegrator::RK4(Object& obj, real dt)
+// runge-kutta 4th order
+void CIntegrator::RungeKutta4(Particle& p, real dt)
 {
-    Derivative a = f(obj, 0.0f, Derivative());
-    Derivative b = f(obj, dt * 0.5f, a);
-    Derivative c = f(obj, dt * 0.5f, b);
-    Derivative d = f(obj, dt, c);
+	Derivative s;
+	
+	s.dp = p.GetVelocity();
+	s.dv = p.GetForce() * p.GetInverseMass();
+
+    Derivative a = f(p, 0.0f, s);
+    Derivative b = f(p, dt * 0.5f, a);
+    Derivative c = f(p, dt * 0.5f, b);
+    Derivative d = f(p, dt, c);
 
     const vec3 dp = 1.0f / 6.0f * (a.dp + 2.0f * (b.dp + c.dp) + d.dp);
     const vec3 dv = 1.0f / 6.0f * (a.dv + 2.0f * (b.dv + c.dv) + d.dv);
 
-    obj.pos = obj.pos + dp * dt;
-    obj.vel = obj.vel + dv * dt;
+	p.SetPosition(p.GetPosition() + dp * dt);
+	p.SetVelocity(p.GetVelocity() + dv * dt);
 }
 
-void CIntegrator::Euler(Object& obj, real dt)
+// euler 1st order
+void CIntegrator::Euler1(Particle& p, real dt)
 {
-	obj.pos = obj.pos + obj.vel * dt;
-	obj.vel = obj.vel + obj.f * obj.invm * dt;
+	p.SetPosition(p.GetPosition() + p.GetVelocity() * dt);
+	p.SetVelocity(p.GetVelocity() + p.GetForce() * p.GetInverseMass() * dt);
 }
 
-void CIntegrator::Newton(Object& obj, real dt)
+// newton 1st order
+void CIntegrator::Newton1(Particle& p, real dt)
 {
-	vec3 adt = obj.f * obj.invm * dt;
+	vec3 adt = p.GetForce() * p.GetInverseMass() * dt;
 
-	obj.pos = obj.pos + obj.vel * dt + 0.5 * adt * dt; 
-	obj.vel = obj.vel + adt;
+	p.SetPosition(p.GetPosition() + p.GetVelocity() * dt + 0.5 * adt * dt); 
+	p.SetVelocity(p.GetVelocity() + adt);
+}
+
+// symplectic euler 1st order
+void CIntegrator::SymplecticEuler1(Particle& p, real dt)
+{
+	p.SetVelocity(p.GetVelocity() + p.GetForce() * p.GetInverseMass() * dt);
+	p.SetPosition(p.GetPosition() + p.GetVelocity() * dt);
+}
+
+// leapfrog 2nd order
+void CIntegrator::Leapfrog2(Particle& p, real dt)
+{
+	vec3 hadt = 0.5 * p.GetForce() * p.GetInverseMass() * dt;
+
+	p.SetVelocity(p.GetVelocity() + hadt);
+	p.SetPosition(p.GetPosition() + p.GetVelocity() * dt);
+	p.SetVelocity(p.GetVelocity() + hadt);
+}
+
+// velocity verlet 2nd order
+void CIntegrator::VelocityVerlet2(Particle& p, real dt)
+{
+	vec3 hadt = 0.5 * p.GetForce() * p.GetInverseMass() * dt;
+
+	p.SetVelocity(p.GetVelocity() + hadt);
+	p.SetPosition(p.GetPosition() + p.GetVelocity()*dt + hadt*dt);
+	p.SetVelocity(p.GetVelocity() + hadt);
+}
+
+// Verlet integration step
+void CIntegrator::VelocityLessVerlet2(Particle& p, real dt) 
+{
+	// x(t+dt) = x(t) + x(t) - x(t-1) + at²;
+	// x(t-1) = x(t);
 }

@@ -10,16 +10,16 @@ CRectangle::CRectangle(const vec2& position, const vec2& dimensions)
 {
 	pos = position;
 
-	dim.x = stick(dimensions.x, 0);
-	dim.y = stick(dimensions.y, 0);
+	dim.x = inf(dimensions.x, 0);
+	dim.y = inf(dimensions.y, 0);
 }
 
 CRectangle::CRectangle(real x, real y, real width, real height)
 {
 	pos = vec2(x, y);
 	
-	dim.x = stick(width, 0);
-	dim.y = stick(height, 0);
+	dim.x = inf(width, 0);
+	dim.y = inf(height, 0);
 }
 		
 void CRectangle::SetPosition(const vec2& position)
@@ -34,14 +34,14 @@ void CRectangle::SetPosition(real x, real y)
 
 void CRectangle::SetDimensions(const vec2& dimensions)
 {
-	dim.x = stick(dimensions.x, 0);
-	dim.y = stick(dimensions.y, 0);
+	dim.x = inf(dimensions.x, 0);
+	dim.y = inf(dimensions.y, 0);
 }
 
 void CRectangle::SetDimensions(real width, real height)
 {
-	dim.x = stick(width, 0);
-	dim.y = stick(height, 0);
+	dim.x = inf(width, 0);
+	dim.y = inf(height, 0);
 }
 
 vec2 CRectangle::GetPosition(void) const

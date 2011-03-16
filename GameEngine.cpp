@@ -41,7 +41,6 @@ void CGameEngine::Start(void)
 	if(m_running == false)
 	{
 		m_running = true;
-
 		
 		glutIdleFunc(IdleFunction);
 		glutDisplayFunc(RenderFunction);

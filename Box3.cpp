@@ -8,12 +8,12 @@
 #include "Box3.h"
 #include "OpenGL.h"
 
-Box3::Box3(void) : Object()
+Box3::Box3(void) : Object3()
 {
 	dim = vec3::One();
 }
 
-Box3::Box3(const vec3& position, const vec3& dimensions) : Object()
+Box3::Box3(const vec3& position, const vec3& dimensions) : Object3()
 {
 	pos = position;
 	dim = dimensions;

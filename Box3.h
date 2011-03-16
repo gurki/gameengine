@@ -8,9 +8,9 @@
 #ifndef _BOX3_H
 #define _BOX3_H
 
-#include "Object.h"
+#include "Object3.h"
 
-class Box3 : public Object
+class Box3 : public Object3
 {
 	public:
 

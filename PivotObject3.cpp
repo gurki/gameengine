@@ -25,12 +25,12 @@ void PivotObject3::RotateAroundPivot(const quat& quat)
 
 void PivotObject3::RotateAroundPivot(const vec3& axis, real angle)
 {
-	pos = piv + (pos - piv) * quat(axis, angle);
+	pos = piv + (pos - piv) * quat::WithAxisAngle(axis, angle);
 }
 
 void PivotObject3::RotateAroundPivot(real yaw, real pitch, real roll)
 {
-	pos = piv + (pos - piv) * quat(yaw, pitch, roll);
+	pos = piv + (pos - piv) * quat::WithEulerAngles(yaw, pitch, roll);
 }
 	
 void PivotObject3::SetRotationAroundPivot(const quat& quat)

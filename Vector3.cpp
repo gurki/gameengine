@@ -264,50 +264,51 @@ istream& operator >> (istream& in, Vector3& vec)
 	return in;
 }	
 
+// static members
 const Vector3 Vector3::Up(void)
 {
-	static const Vector3 vec = Vector3( 0, 1, 0);
+	static const Vector3 vec( 0, 1, 0);
 	return vec;
 }
 
 const Vector3 Vector3::Down(void)
 {
-	static const Vector3 vec = Vector3( 0,-1, 0);
+	static const Vector3 vec( 0,-1, 0);
 	return vec;
 }
 
 const Vector3 Vector3::Left(void)
 {
-	static const Vector3 vec = Vector3(-1, 0, 0);
+	static const Vector3 vec(-1, 0, 0);
 	return vec;
 }
 
 const Vector3 Vector3::Right(void)
 {
-	static const Vector3 vec = Vector3( 1, 0, 0);
+	static const Vector3 vec( 1, 0, 0);
 	return vec;
 }
 
 const Vector3 Vector3::Forward(void)
 {
-	static const Vector3 vec = Vector3( 0, 0,-1);
+	static const Vector3 vec( 0, 0,-1);
 	return vec;
 }
 
 const Vector3 Vector3::Backward(void)
 {
-	static const Vector3 vec = Vector3(0, 0, 1);
+	static const Vector3 vec(0, 0, 1);
 	return vec;
 }
 
 const Vector3 Vector3::One(void)
 {
-	static const Vector3 vec = Vector3( 1, 1, 1);
+	static const Vector3 vec( 1, 1, 1);
 	return vec;
 }
 
 const Vector3 Vector3::Zero(void)
 {
-	static const Vector3 vec = Vector3( 0, 0, 0);
+	static const Vector3 vec( 0, 0, 0);
 	return vec;
 }

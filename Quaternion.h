@@ -50,18 +50,16 @@ class Quaternion
 		// real operators
 		Quaternion operator * (real n) const;
 		Quaternion operator / (real n) const;
+		friend Quaternion operator * (real n, const Quaternion& quat);
 
 		Quaternion& operator *= (real n);
 		Quaternion& operator /= (real n);
 
-		friend Quaternion operator * (real n, const Quaternion& quat);
-
-		// vector operators
+		// vector arithmetics
 		vec3 operator * (const vec3& vec) const;
-
 		friend vec3 operator * (const vec3& vec, const Quaternion& quat);
 
-		// quaternion operators
+		// quaternion arithmetics
 		Quaternion operator + (const Quaternion& quat) const;
 		Quaternion operator - (const Quaternion& quat) const;
 		Quaternion operator * (const Quaternion& quat) const;
@@ -70,11 +68,11 @@ class Quaternion
 		Quaternion& operator -= (const Quaternion& quat);
 		Quaternion& operator *= (const Quaternion& quat);
 
-		// quaternion functions
+		// manipulations
 		Quaternion Normalised(void) const;
-		Quaternion& Normalise(void);
-
 		Quaternion Conjugated(void) const;
+
+		Quaternion& Normalise(void);
 		Quaternion& Conjugate(void);
 
 		// static setter

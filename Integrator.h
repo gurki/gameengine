@@ -9,7 +9,7 @@
 #define _INTEGRATOR_H
 
 #include "Types.h"
-#include "Object.h"
+#include "Particle.h"
 
 #define Integrator CIntegrator::GetInstance()
 
@@ -23,13 +23,17 @@ class CIntegrator
 {
 	public:
 
-		void RK4(Object& obj, real dt);
-		void Euler(Object& obj, real dt);
-		void Newton(Object& obj, real dt);
+		void RungeKutta4(Particle& obj, real dt);
+		void Euler1(Particle& obj, real dt);
+		void SymplecticEuler1(Particle& obj, real dt);
+		void Newton1(Particle& obj, real dt);
+		void Leapfrog2(Particle& obj, real dt);
+		void VelocityVerlet2(Particle& obj, real dt);
+		void VelocityLessVerlet2(Particle& obj, real dt);
 
 	private:
 
-		Derivative f(const Object& initial, real dt, const Derivative& d);
+		Derivative f(const Particle& initial, real dt, const Derivative& d);
 
 	public:
 

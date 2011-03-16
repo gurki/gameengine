@@ -12,18 +12,18 @@
 #include "Types.h"
 
 // angles
-#define rad(deg) deg * C_PIDIV180
-#define deg(rad) rad * C_180DIVPI
+#define rad(deg) ((deg) * C_PIDIV180)
+#define deg(rad) ((rad) * C_180DIVPI)
 
 // min & max
-template <class T> inline T min2(T a, T b) { return (a < b) ? a : b; }
-template <class T> inline T max2(T a, T b) { return (a > b) ? a : b; }
+#define min2(a, b) ((a < b) ? a : b)
+#define max2(a, b) ((a > b) ? a : b)
 
-template <class T> inline T min3(T a, T b, T c) { return min2(min2(a, b), c); }
-template <class T> inline T max3(T a, T b, T c) { return max2(max2(a, b), c); }
+#define min3(a, b, c) (min2(min2(a, b), c))
+#define max3(a, b, c) (max2(max2(a, b), c))
 
 // remainder
-#define mod(a, b) ((a >= 0) ? (real)a - (int)(a / b) * (real)b : (1 - (int)(a / b)) * (real)b + (real)a)
+#define mod(a, b) (((a) >= 0) ? (real)(a) - (int)((a) / (b)) * (real)(b) : (1 - (int)((a) / (b))) * (real)(b) + (real)(a))
 
 #define modi(a, b) ((a >= 0) ? (int)   a - (int)(a / b) * (int)   b : (1 - (int)(a / b)) * (int)   b + (int)   a)
 #define modf(a, b) ((a >= 0) ? (float) a - (int)(a / b) * (float) b : (1 - (int)(a / b)) * (float) b + (float) a)
@@ -35,14 +35,14 @@ template <class T> inline T max3(T a, T b, T c) { return max2(max2(a, b), c); }
 #define sign(a) (a >= 0 ? 1 : -1)
 
 // limiting
-#define stick(n, inf) ((n < inf) ? inf : n)
-#define clamp(n, sup) ((n > sup) ? sup : n)
+#define inf(n, i) ((n < i) ? i : n)
+#define sup(n, s) ((n > s) ? s : n)
 
-#define limit(n, inf, sup) (stick( clamp(n, sup), inf ))
+#define limit(n, i, s) (inf( sup(n, s), i ))
 
 // integers
-#define floor(a) (int)(a)
-#define ceil(a) (int)(a) + 1
+#define floor(a) ((int)(a))
+#define ceil(a) ((int)(a) + 1)
 
 #define absr(a) ((a >= 0) ? a : -a) 
 
@@ -56,15 +56,28 @@ template <class T> inline T max3(T a, T b, T c) { return max2(max2(a, b), c); }
 #define atanr(a) (real)atan(a)
 #define atan2r(a, b) (real)atan2(a, b)
 
+#define cos2(rad, s) ((mod(rad + C_PIDIV2, C_2PI) < C_PI ? 1 : -1) * sqrt(1 - s * s))
+
 // sqrt
 #define sqrtr(a) (real)sqrt(a)
 
 // prime
 inline bool isPrime(int n);
 
-// constants
-#define C_EPSILON    (real)0.00001                 // smallest possible float value different from 1.0
+// limits
+#define C_MAXF             3.402823466e38          // largest representable float value
+#define C_MAXD             1.7976931348623157e308  // largest representable double value
 
+#define C_MINPRECISEF      1.175494351e-38         // smallest representable float value without loosing precission
+#define C_MINPRECISED      2.2250738585072014e-308 // smallest representable double value without loosing precission
+
+#define C_MINF             1.401298464e-45         // smallest representable float value
+#define C_MIND             5e-324                  // smallest representable double value
+
+#define C_EPSILONF         1.1929093e-7            // smallest possible float value different from 1.0
+#define C_EPSILOND         2.220446049250313e-16   // smallest possible double value different from 1.0
+
+// constants
 #define C_1DIV3      (real)0.333333333333333333333 // 1/3
 #define C_2DIV3      (real)0.666666666666666666667 // 2/3
 #define C_1DIV6      (real)0.166666666666666666667 // 1/6
@@ -99,5 +112,40 @@ inline bool isPrime(int n);
 
 #define C_PIDIV180   (real)0.017453292519943295769 // pi/180
 #define C_180DIVPI   (real)57.2957795130823208769  // 180/pi
+
+// efficient algorithms
+
+/* 
+	sincos functions
+
+	standard c-library: slow tempo, reference
+	tangens conversion: mid tempo, temp variable costs, precision in ED
+	trigonom. identity: fast tempo, sign costs, precision in EF
+
+	template <class T>
+	inline void clibrary(const T angle, T& s, T& c) 
+	{
+		s = sin(angle);
+		c = cos(angle);
+	}
+
+	template <class T>
+	inline void tangent(const T angle, T& s, T& c) 
+	{
+		double z = tan(angle * 0.5);
+
+		s = 2 * z / (1 + z * z);
+		c = (1 - z * z) / (1 + z * z);
+	}
+
+	template <class T>
+	inline void trigid(const T angle, T& s, T& c) 
+	{
+		s = sin(angle);
+		c = (mod(angle + C_PIDIV2, C_2PI) < C_PI ? 1 : -1) * sqrt(1 - s * s);
+	}
+
+	problem with all: function call takes too long!!
+*/
 
 #endif
