@@ -17,7 +17,7 @@
 
 using namespace std;
 
-#define n 6
+#define n 9
 
 Camera cam1;
 Grid3 grid;
@@ -34,8 +34,9 @@ int main(int argc, char** argv)
 	
 	for(uint i = 0; i < n; i++)
 	{
-		real d = (i - n/2.0) * 10 / n;
-		p[i].SetPosition( vec3(sin(d) * d, d, cos(d) * d) );
+		// real d = (i - n/2.0) * 10 / n;
+		// p[i].SetPosition( vec3(sin(d) * d, d, cos(d) * d) );
+		p[i].SetPosition( vec3((i % 3) - 1.5, 3 - (i % 3), 0) );
 	}
 	
 	grid.SetDimensions(10, 10);
@@ -85,31 +86,53 @@ void CGameEngine::Idle(void) const
 	t += dt;
 
 	real k = 10.0;
-	real b = 0.1;
+	real b = 1.0;
 
-	while(abs(t) > ts)
+	while(absr(t) > ts)
 	{
 		for(uint i = 0; i < n; i++)
 		{
-			vec3 pos = p[(i+1)%n].GetPosition();
-			vec3 f = - k * (p[i].GetPosition() - pos) - b * p[i].GetVelocity();
-
+			vec3 pos1 = p[i].GetPosition();
+			vec3 pos2 = p[(i+1) % n].GetPosition();
+			
+			// springs
+			vec3 f = - k * (pos1 - pos2) - b * p[i].GetVelocity();
+			
 			p[i].AddForce(f);
 			p[(i+1)%n].AddForce(-f);
-			
-			// p[i].AddForce( vec3(0.0, -9.81 * p[i].GetMass(), 0.0) );
+			/*
+			// gravity
+			p[i].AddForce( vec3(0.0, -9.81 * p[i].GetMass(), 0.0) );
+			*/
 		}
 	
 		for(uint i = 0; i < n; i++)
 		{
-			Integrator.SymplecticEuler1(p[i], sign(dt) * ts);
+			Integrator.RungeKutta4(p[i], sign(dt) * ts);
 		}
 
 		for(uint i = 0; i < n; i++)
 		{
 			p[i].ClearForces();
 		}
-/*
+
+		for(uint i = 0; i < n; i++)
+		{
+			vec3 pos1 = p[i].GetPosition();
+			vec3 pos2 = p[(i+1) % n].GetPosition();
+	
+			// rods
+			Vector3 d = pos2 - pos1;
+
+			real l = 10.0;
+			real s = d.SquaredMagnitude();
+			
+			vec3 e = d * 0.25 * (s - l) / (s);
+
+			p[i].SetPosition(pos1 + e);
+			p[(i+1) % n].SetPosition(pos2 - e);
+		}
+		/*
 		for(uint i = 0; i < n; i++)
 		{
 			vec3 pos = p[i].GetPosition();
@@ -121,9 +144,17 @@ void CGameEngine::Idle(void) const
 				p[i].SetVelocity( vec3(vel.x, -vel.y, vel.z) );
 			}
 		}
-*/
+		*/
 		t -= sign(dt) * ts;
 	}
+	
+	static real s = 1.0;
+	
+	if(Keyboard.KeyIsPressed('w')) { p[0].AddForce( 10 * vec3::Forward() ); }
+	if(Keyboard.KeyIsPressed('s')) { p[0].AddForce( 10 * vec3::Backward() ); }
+	
+	if(Keyboard.KeyIsPressed('a')) { p[0].AddForce( 10 * vec3::Left() ); }
+	if(Keyboard.KeyIsPressed('d')) { p[0].AddForce( 10 * vec3::Right() ); }
 }
 
 void CGameEngine::Input(void) const
@@ -132,15 +163,9 @@ void CGameEngine::Input(void) const
 	// real rot = Clock.GetTimeDelta() * 250;
 	
 	static real s = 1.0;
-
-	if(Keyboard.KeyIsPressed('w')) { s = sup(s + 0.001, 2); Clock.SetTimescale(s); cout << s << endl; }
-	if(Keyboard.KeyIsPressed('s')) { s = inf(s - 0.001,-2); Clock.SetTimescale(s); cout << s << endl; }
 	
-	if(Keyboard.KeyIsPressed('d')) { s = sup(s + 0.01, 2); Clock.SetTimescale(s); cout << s << endl; }
-	if(Keyboard.KeyIsPressed('a')) { s = inf(s - 0.01,-2); Clock.SetTimescale(s); cout << s << endl; }
-
-	if(Keyboard.KeyIsPressed('e')) { s = 1; Clock.SetTimescale(s); cout << s << endl; }
-	if(Keyboard.KeyIsPressed('q')) { s =-1; Clock.SetTimescale(s); cout << s << endl; }
+	if(Keyboard.KeyIsPressed('e')) { s = sup(s + 0.001, 2); Clock.SetTimescale(s); cout << s << endl; }
+	if(Keyboard.KeyIsPressed('q')) { s = inf(s - 0.001,-2); Clock.SetTimescale(s); cout << s << endl; }
 
 	if(Keyboard.KeyWasPressed('p')) GameEngine.Pause();
 	if(Keyboard.KeyWasPressed('u')) GameEngine.Unpause();
