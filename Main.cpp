@@ -17,12 +17,79 @@
 
 using namespace std;
 
-#define n 9
+#define r (10)
+#define n (r * r)
 
 Camera cam1;
 Grid3 grid;
 Box3 box;
 Particle p[n];
+
+inline void Gravity(Particle& p)
+{
+	p.AddForce( vec3(0.0, -9.81 * p.GetMass(), 0.0) );
+}
+
+inline void Spring(Particle& p1, Particle& p2, real k, real b)
+{
+	vec3 d = p2.GetPosition() - p1.GetPosition();
+
+	vec3 f1 = - k * d - b * p1.GetVelocity();
+	vec3 f2 =   k * d - b * p2.GetVelocity();
+			
+	p1.AddForce(f1);
+	p2.AddForce(f2);
+}
+
+inline void Spring(Particle& p, vec3& v, real k, real b)
+{
+	vec3 d = p.GetPosition() - v;
+	vec3 f = - k * d - b * p.GetVelocity();
+			
+	p.AddForce(f);
+}
+
+inline void Rope(Particle& p1, Particle& p2, real s)
+{
+	vec3 d = p2.GetPosition() - p1.GetPosition();
+	real l = d.SquaredMagnitude();
+
+	vec3 v1 = vec3::Zero();
+	vec3 v2 = vec3::Zero();
+	vec3 e = vec3::Zero();
+
+	if(l > s * s) 
+	{
+		v1 = d * (d.Dot(p1.GetVelocity()) / l);
+		v2 = d * (d.Dot(p2.GetVelocity()) / l);
+				
+		e = d * 0.25 * (s * s - l) / (s * s);
+	}
+		
+	// p1.SetVelocity(p1.GetVelocity() - v1);
+	p1.SetPosition(p1.GetPosition() - e);
+	
+	// p2.SetVelocity(p2.GetVelocity() - v2);
+	p2.SetPosition(p2.GetPosition() + e);
+}
+
+inline void Rope(Particle& p, vec3 f, real s)
+{
+	vec3 d = f - p.GetPosition();
+	real l = d.SquaredMagnitude();
+
+	vec3 v = vec3::Zero();
+	vec3 e = vec3::Zero();
+
+	if(l > s * s) 
+	{
+		v = d * (d.Dot(p.GetVelocity()) / l);	
+		e = d * 0.25 * (s * s - l) / (s * s);
+	}
+		
+	p.SetVelocity(p.GetVelocity() - v);
+	p.SetPosition(p.GetPosition() - e);
+}
 
 int main(int argc, char** argv)
 {
@@ -34,12 +101,15 @@ int main(int argc, char** argv)
 	
 	for(uint i = 0; i < n; i++)
 	{
-		// real d = (i - n/2.0) * 10 / n;
-		// p[i].SetPosition( vec3(sin(d) * d, d, cos(d) * d) );
-		p[i].SetPosition( vec3((i % 3) - 1.5, 3 - (i % 3), 0) );
+		p[i].SetPosition( vec3(0, r, 0) );
 	}
 	
 	grid.SetDimensions(10, 10);
+
+	glPointSize(5);
+	glEnable(GL_POINT_SMOOTH);
+
+	Clock.SetTimescale(2);
 
 	GameEngine.Start();
 
@@ -59,15 +129,19 @@ void CGameEngine::Render(void) const
 	cam1.SetActive();
 
 	Color c;
+
+	glBegin(GL_POINTS);
+
 	// boxes
 	for(uint i = 0; i < n; i++)
 	{
 		c.SetHLS((real)i / (real)n, 0.5, 1.0);
 		c.Bind();
 
-		box.SetPosition(p[i].GetPosition());
-		box.Render();
+		glVertex3fv(p[i].GetPosition().v);
 	}
+
+	glEnd();
 
 	// grid
 	Color::GetColor(WHITE).Bind();
@@ -84,31 +158,28 @@ void CGameEngine::Idle(void) const
 	real dt = Clock.GetTimeDelta();
 
 	t += dt;
-
-	real k = 10.0;
-	real b = 1.0;
-
+	
 	while(absr(t) > ts)
 	{
 		for(uint i = 0; i < n; i++)
 		{
-			vec3 pos1 = p[i].GetPosition();
-			vec3 pos2 = p[(i+1) % n].GetPosition();
-			
-			// springs
-			vec3 f = - k * (pos1 - pos2) - b * p[i].GetVelocity();
-			
-			p[i].AddForce(f);
-			p[(i+1)%n].AddForce(-f);
-			/*
-			// gravity
-			p[i].AddForce( vec3(0.0, -9.81 * p[i].GetMass(), 0.0) );
-			*/
+			if(i >= r)
+			{
+				Gravity(p[i]);
+
+				Rope(p[i], p[i-r].GetPosition(), 0.5);
+			}
+
+			if( (i + 1) % r != 0)
+			{
+				Rope(p[i], p[i + 1], 0.5);
+			}
 		}
-	
+				
 		for(uint i = 0; i < n; i++)
 		{
-			Integrator.RungeKutta4(p[i], sign(dt) * ts);
+			p[i].AddForce( - 5 * p[i].GetVelocity() );
+			Integrator.VelocityVerlet2(p[i], sign(dt) * ts);
 		}
 
 		for(uint i = 0; i < n; i++)
@@ -116,52 +187,19 @@ void CGameEngine::Idle(void) const
 			p[i].ClearForces();
 		}
 
-		for(uint i = 0; i < n; i++)
-		{
-			vec3 pos1 = p[i].GetPosition();
-			vec3 pos2 = p[(i+1) % n].GetPosition();
-	
-			// rods
-			Vector3 d = pos2 - pos1;
-
-			real l = 10.0;
-			real s = d.SquaredMagnitude();
-			
-			vec3 e = d * 0.25 * (s - l) / (s);
-
-			p[i].SetPosition(pos1 + e);
-			p[(i+1) % n].SetPosition(pos2 - e);
-		}
-		/*
-		for(uint i = 0; i < n; i++)
-		{
-			vec3 pos = p[i].GetPosition();
-
-			if(pos.y <= 0.0)
-			{
-				vec3 vel = p[i].GetVelocity();
-
-				p[i].SetVelocity( vec3(vel.x, -vel.y, vel.z) );
-			}
-		}
-		*/
 		t -= sign(dt) * ts;
 	}
+
+	p[0].SetVelocity( vec3::Zero() );
 	
-	static real s = 1.0;
-	
-	if(Keyboard.KeyIsPressed('w')) { p[0].AddForce( 10 * vec3::Forward() ); }
-	if(Keyboard.KeyIsPressed('s')) { p[0].AddForce( 10 * vec3::Backward() ); }
-	
-	if(Keyboard.KeyIsPressed('a')) { p[0].AddForce( 10 * vec3::Left() ); }
-	if(Keyboard.KeyIsPressed('d')) { p[0].AddForce( 10 * vec3::Right() ); }
+	if(Keyboard.KeyIsPressed('w')) { p[0].SetVelocity( 20 * vec3::Forward() ); }
+	if(Keyboard.KeyIsPressed('s')) { p[0].SetVelocity( 20 * vec3::Backward() ); }
+	if(Keyboard.KeyIsPressed('a')) { p[0].SetVelocity( 20 * vec3::Left() ); }
+	if(Keyboard.KeyIsPressed('d')) { p[0].SetVelocity( 20 * vec3::Right() ); }
 }
 
 void CGameEngine::Input(void) const
 {
-	// real mov = Clock.GetTimeDelta() * 10;
-	// real rot = Clock.GetTimeDelta() * 250;
-	
 	static real s = 1.0;
 	
 	if(Keyboard.KeyIsPressed('e')) { s = sup(s + 0.001, 2); Clock.SetTimescale(s); cout << s << endl; }

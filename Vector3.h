@@ -66,7 +66,6 @@ class Vector3
 			
 		friend ostream& operator << (ostream& out, const Vector3& vec);  
 		friend istream& operator >> (istream& in, Vector3& vec); 
-
 		
 	// member variables
 	
