@@ -333,7 +333,7 @@ const Matrix3x3& Matrix3x3::Identity(void)
 
 	return m;
 }
-
+/*
 // convertions
 Matrix3x3 Matrix3x3::WithQuaternion(const Quaternion& q)
 {
@@ -353,7 +353,7 @@ Matrix3x3 Matrix3x3::WithQuaternion(const Quaternion& q)
 
 	return r;
 }
-
+*/
 // iostream
 ostream& operator << (ostream& out, const Matrix3x3& m)
 {

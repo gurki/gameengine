@@ -7,35 +7,36 @@
 
 #pragma once
 
-#include "MathLib.h"
-#include "Vector2.h"
+#include "Object2.h"
+#include "Color.h"
 
-class CRectangle
+class Rectangle : public virtual Object2
 {
 	public:
 
-		CRectangle(void);
-		CRectangle(const vec2& position, const vec2& dimensions);
-		CRectangle(real x, real y, real width, real height);
-
-		virtual void SetPosition(const vec2& position);
-		virtual void SetPosition(real x, real y);
-
-		virtual void SetDimensions(const vec2& dimensions);
-		virtual void SetDimensions(real width, real height);
+		// constructors
+		Rectangle(void);
+		Rectangle(real x, real y, real width, real height);
+		Rectangle(const vec2& position, const vec2& dimensions);
 		
-		vec2 GetPosition(void) const;
+		// methods
+		void Render(void) const;
+		
+		// setter
+		virtual void SetDimensions(real width, real height);
+		virtual void SetDimensions(const vec2& dimensions);
+		
+		// getter
 		vec2 GetDimensions(void) const;
-
 		vec2 GetCenter(void) const;
-		vec2 GetAbsoluteCenter(void) const;
-
 		real GetRatio(void) const;
 
 	protected:
-
-		vec2 pos;
+	
+		// variables
 		vec2 dim;
+		
+		vec2 d[4];
 };
 
-typedef CRectangle rect;
+typedef Rectangle rect;

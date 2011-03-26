@@ -12,7 +12,7 @@
 
 #define Screen CScreen::GetInstance()
 
-class CScreen : public CRectangle
+class CScreen : public Rectangle
 {
 	public:
 

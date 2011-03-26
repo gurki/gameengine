@@ -260,7 +260,7 @@ istream& operator >> (istream& in, Vector2& vec)
 	vec.y = y;
 
 	return in;
-}	
+}
 
 const Vector2 Vector2::Up(void)
 {
@@ -280,7 +280,7 @@ const Vector2 Vector2::One(void)
 	return vec;
 }
 
-const Vector2 Vector2::Zero(void) 
+const Vector2 Vector2::Zero(void)
 {
 	static const Vector2 vec = Vector2(0, 0);
 	return vec;

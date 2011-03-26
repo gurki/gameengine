@@ -9,7 +9,7 @@
 
 #include "Types.h"
 #include "Vector3.h"
-#include "Quaternion.h"
+// #include "Quaternion.h"
 
 #include <iostream>
 
@@ -62,10 +62,10 @@ class Matrix3x3
 		// static members
 		static const Matrix3x3& Zero(void);
 		static const Matrix3x3& Identity(void);
-
+/*
 		// convertions
 		static Matrix3x3 WithQuaternion(const Quaternion& q);
-
+*/
 		// iostream
 		friend ostream& operator << (ostream& out, const Matrix3x3& m);
 		friend istream& operator >> (istream& in, Matrix3x3& m);

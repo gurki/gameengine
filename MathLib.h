@@ -84,6 +84,7 @@ inline bool isPrime(int n);
 #define C_E          (real)2.71828182845904523536  // e
 #define C_PI         (real)3.14159265358979323846  // pi
 #define C_SQRT2      (real)1.41421356237309504880  // sqrt(2)
+#define C_SQRT3      (real)1.73205080756887729353  // sqrt(3)
 
 #define C_2PI        (real)6.28318530717958647692  // 2*pi
 
@@ -94,6 +95,7 @@ inline bool isPrime(int n);
 #define C_EDIV2      (real)1.35914091422952261768  // e/2
 #define C_PIDIV2     (real)1.57079632679489661923  // pi/2
 #define C_SQRT2DIV2  (real)0.707106781186547524400 // sqrt(2)/2
+#define C_SQRT3DIV2  (real)0.866025403778443864676 // sqrt(3)/2
 
 #define C_1DIVE      (real)0.367879441171442321595 // 1/e
 #define C_1DIVPI     (real)0.318309886183790671538 // 1/pi

@@ -67,7 +67,7 @@ void Camera::UpdateViewport(void) const
 
 	if(projection == CAMERA_ORTHOGRAPHIC)
 	{
-		glOrtho(0, d.x, d.y, 0, near, far);
+		glOrtho(0, d.x, 0, d.y, near, far);
 		glViewport(p.x, p.y, d.x, d.y);
 	}
 	else 

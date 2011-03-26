@@ -17,7 +17,7 @@ using namespace std;
 
 #define Window CWindow::GetInstance()
 
-class CWindow : public CRectangle
+class CWindow : public Rectangle
 {
 	public:
 

@@ -7,10 +7,8 @@
 
 #include "Screen.h"
 
-CScreen::CScreen(void)
+CScreen::CScreen(void) : Rectangle()
 {
-	pos = vec2(0, 0);
-
 	dim.x = glutGet(GLUT_SCREEN_WIDTH);
 	dim.y = glutGet(GLUT_SCREEN_HEIGHT);
 }

@@ -30,6 +30,7 @@ void CGameEngine::Initialize(int argc, char** argv)
 	glEnable(GL_LIGHT0);
 	glEnable(GL_COLOR_MATERIAL);
 
+	glPointSize(5.0f);
 	glShadeModel(GL_SMOOTH);
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 }
@@ -94,8 +95,6 @@ void CGameEngine::InputFunction(void)
 	{
 		GameEngine.End();
 	}
-
-	GameEngine.Input();
 }
 
 void CGameEngine::RenderFunction(void)

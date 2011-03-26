@@ -8,7 +8,7 @@
 #include "Window.h"
 #include "Camera.h"
 
-CWindow::CWindow(void)
+CWindow::CWindow(void) : Rectangle()
 {
 	dim = Screen.GetDimensions() * 0.64;
 	pos = Screen.GetCenter() - dim * 0.5;

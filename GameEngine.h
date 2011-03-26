@@ -46,7 +46,6 @@ class CGameEngine
 
 		virtual void Idle(void) const;
 		virtual void Render(void) const;
-		virtual void Input(void) const;
 
 	private:
 
