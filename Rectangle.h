@@ -5,8 +5,7 @@
 //                                                                           //
 //***************************************************************************//
 
-#ifndef _RECTANGLE_H
-#define _RECTANGLE_H
+#pragma once
 
 #include "MathLib.h"
 #include "Vector2.h"
@@ -40,5 +39,3 @@ class CRectangle
 };
 
 typedef CRectangle rect;
-
-#endif

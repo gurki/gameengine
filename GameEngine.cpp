@@ -6,7 +6,6 @@
 //***************************************************************************//
 
 #include "GameEngine.h"
-#include "Network.h"
 
 //***************************************************************************//
 //                            The GameEngine Class                           //
@@ -19,7 +18,6 @@ void CGameEngine::Initialize(int argc, char** argv)
 	glutInit(&argc, argv);
 
 	Window.Initialize();
-	Network.Initialize();
 
 	m_paused = false;
 	m_running = false;

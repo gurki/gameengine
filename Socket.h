@@ -5,8 +5,7 @@
 //                                                                           //
 //***************************************************************************//
 
-#ifndef _SOCKET_H
-#define _SOCKET_H
+#pragma once
 
 #include "Address.h"
 
@@ -29,5 +28,3 @@ class Socket
 
 		int handle;
 };
-
-#endif

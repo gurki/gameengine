@@ -5,8 +5,7 @@
 //                                                                           //
 //***************************************************************************//
 
-#ifndef _TIMER_H
-#define _TIMER_H
+#pragma once
 
 #define Clock CTimer::GetInstance()
 
@@ -48,5 +47,3 @@ class CTimer
 		CTimer& operator = (CTimer const&) { return *this; };
 		~CTimer(void) {};
 };
-
-#endif

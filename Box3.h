@@ -5,8 +5,7 @@
 //                                                                           //
 //***************************************************************************//
 
-#ifndef _BOX3_H
-#define _BOX3_H
+#pragma once
 
 #include "Object3.h"
 
@@ -24,4 +23,4 @@ class Box3 : public Object3
 		vec3 dim;
 };
 
-#endif
+#pragma once

@@ -1,5 +1,4 @@
-#ifndef _OPENGL_H
-#define _OPENGL_H
+#pragma once
 
 #include "Types.h"
 
@@ -12,9 +11,7 @@
 #endif
 
 #ifdef OS_WINDOWS
-#pragma comment(lib, "OpenGL32.lib")
-#pragma comment(lib, "GLUT32.lib")
-#pragma comment(lib, "GLU32.lib")
-#endif
-
+	#pragma comment(lib, "OpenGL32.lib")
+	#pragma comment(lib, "GLUT32.lib")
+	#pragma comment(lib, "GLU32.lib")
 #endif

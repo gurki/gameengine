@@ -5,8 +5,7 @@
 //                                                                           //
 //***************************************************************************//
 
-#ifndef _QUATERNION_H
-#define _QUATERNION_H
+#pragma once
 
 #include "MathLib.h"
 #include "Vector3.h"
@@ -104,5 +103,3 @@ class Quaternion
 };
 
 typedef Quaternion quat;
-
-#endif

@@ -5,8 +5,7 @@
 //                                                                           //
 //***************************************************************************//
 
-#ifndef _SERVER_H
-#define _SERVER_H
+#pragma once
 
 #include "Socket.h"
 #include "Types.h"
@@ -48,5 +47,3 @@ class Server : public Socket
 
 		vector<Player> clients;		
 };
-
-#endif

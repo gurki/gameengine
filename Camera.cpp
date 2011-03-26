@@ -89,6 +89,7 @@ void Camera::SetPerspective(void)
 void Camera::SetOrthographic(void)
 {
 	projection = CAMERA_ORTHOGRAPHIC;
+	near = 0.0;
 
 	UpdateViewport();
 }
@@ -131,7 +132,12 @@ void Camera::SetRelativeViewport(real x, real y, real width, real height)
 	UpdateViewport();
 }
 
-const Camera* Camera::GetActiveCamera(void)
+rect Camera::GetView(void)
+{
+	return view;
+}
+
+Camera* Camera::GetActiveCamera(void)
 {
 	return active;
 }

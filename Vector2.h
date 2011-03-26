@@ -5,8 +5,7 @@
 //                                                                           //
 //***************************************************************************//
 
-#ifndef _VECTOR2_H
-#define _VECTOR2_H
+#pragma once
 
 #include "Types.h"
 #include <iostream>
@@ -85,5 +84,3 @@ class Vector2
 
 
 typedef Vector2 vec2;
-
-#endif

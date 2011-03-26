@@ -5,8 +5,7 @@
 //                                                                           //
 //***************************************************************************//
 
-#ifndef _GAME_ENGINE_H
-#define _GAME_ENGINE_H
+#pragma once
 
 #include "OpenGL.h"
 #include "Vector2.h"
@@ -219,5 +218,3 @@ class CMouse
 		CMouse& operator = (CMouse const&) { return *this; };
 		~CMouse(void) {};
 };
-
-#endif

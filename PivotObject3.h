@@ -5,8 +5,7 @@
 //                                                                           //
 //***************************************************************************//
 
-#ifndef _PIVOT_OBJECT3_H
-#define _PIVOT_OBJECT3_H
+#pragma once
 
 #include "Object3.h"
 
@@ -33,5 +32,3 @@ class PivotObject3 : public Object3
 
 		vec3 piv;
 };
-
-#endif

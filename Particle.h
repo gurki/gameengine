@@ -5,8 +5,7 @@
 //                                                                           //
 //***************************************************************************//
 
-#ifndef _PARTICLE_H
-#define _PARTICLE_H
+#pragma once
 
 #include "Types.h"
 #include "Vector3.h"
@@ -47,5 +46,3 @@ class Particle
 		vec3 f;
 		real invm;
 };
-
-#endif

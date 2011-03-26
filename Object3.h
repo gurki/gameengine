@@ -5,8 +5,7 @@
 //                                                                           //
 //***************************************************************************//
 
-#ifndef _OBJECT3_H
-#define _OBJECT3_H
+#pragma once
 
 #include "MathLib.h"
 #include "Vector3.h"
@@ -46,5 +45,3 @@ class Object3
 		vec3 pos;
 		quat rot;
 };
-
-#endif

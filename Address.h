@@ -5,8 +5,7 @@
 //                                                                           //
 //***************************************************************************//
 
-#ifndef _ADDRESS_H
-#define _ADDRESS_H
+#pragma once
 
 #include "Types.h"
 
@@ -58,5 +57,3 @@ class Address
 		uint address;
 		ushort port;
 };
-
-#endif

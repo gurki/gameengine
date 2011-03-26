@@ -5,8 +5,7 @@
 //                                                                           //
 //***************************************************************************//
 
-#ifndef _CAMERA_H
-#define _CAMERA_H
+#pragma once
 
 #include "Object3.h"
 #include "Rectangle.h"
@@ -35,7 +34,9 @@ class Camera : public Object3
 		void SetAbsoluteViewport(uint x, uint y, uint width, uint height);
 		void SetRelativeViewport(real x, real y, real width, real height);
 
-		static const Camera* GetActiveCamera(void);
+		rect GetView(void);
+		
+		static Camera* GetActiveCamera(void);
 		
 	private:
 
@@ -50,5 +51,3 @@ class Camera : public Object3
 		real near;
 		real far;
 };
-
-#endif

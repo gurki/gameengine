@@ -5,8 +5,7 @@
 //                                                                           //
 //***************************************************************************//
 
-#ifndef _VECTOR_H
-#define _VECTOR_H
+#pragma once
 
 #include "Types.h"
 
@@ -316,5 +315,3 @@ class Vector
 #define vecb(n) Vector<bool,   n>
 #define vecf(n) Vector<float,  n>
 #define vecd(n) Vector<double, n>
-
-#endif

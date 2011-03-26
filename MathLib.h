@@ -5,8 +5,7 @@
 //                                                                           //
 //***************************************************************************//
 
-#ifndef _MATHLIB_H
-#define _MATHLIB_H
+#pragma once
 
 #include <math.h>
 #include "Types.h"
@@ -147,5 +146,3 @@ inline bool isPrime(int n);
 
 	problem with all: function call takes too long!!
 */
-
-#endif

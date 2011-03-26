@@ -5,8 +5,7 @@
 //                                                                           //
 //***************************************************************************//
 
-#ifndef _MATRIX_H
-#define _MATRIX_H
+#pragma once
 
 #include "Types.h"
 #include "Vector.h"
@@ -478,5 +477,3 @@ typedef Matrix<int,    4, 4> mat4i;
 typedef Matrix<bool,   4, 4> mat4b;
 typedef Matrix<float,  4, 4> mat4f;
 typedef Matrix<double, 4, 4> mat4d;
-
-#endif

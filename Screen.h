@@ -5,8 +5,7 @@
 //                                                                           //
 //***************************************************************************//
 
-#ifndef _SCREEN_H
-#define _SCREEN_H
+#pragma once
 
 #include "OpenGL.h"
 #include "Rectangle.h"
@@ -30,5 +29,3 @@ class CScreen : public CRectangle
 		CScreen& operator = (CScreen const&) { return *this; };
 		~CScreen(void) {};
 };
-
-#endif

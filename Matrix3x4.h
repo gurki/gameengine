@@ -5,8 +5,7 @@
 //                                                                           //
 //***************************************************************************//
 
-#ifndef _MATRIX3X4_H
-#define _MATRIX3X4_H
+#pragma once
 
 #include "Types.h"
 #include "Vector3.h"
@@ -88,5 +87,3 @@ class Matrix3x4
 
 // typedefs
 typedef Matrix3x4 mat34;
-
-#endif

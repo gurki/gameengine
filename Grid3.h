@@ -5,8 +5,7 @@
 //                                                                           //
 //***************************************************************************//
 
-#ifndef _GRID3_H
-#define _GRID3_H
+#pragma once
 
 #include "Object3.h"
 #include "Vector2.h"
@@ -31,5 +30,3 @@ class Grid3 : public Object3
 		vec2 dim;
 		vec2 res;
 };
-
-#endif

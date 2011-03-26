@@ -5,8 +5,7 @@
 //                                                                           //
 //***************************************************************************//
 
-#ifndef _NETWORK_H
-#define _NETWORK_H
+#pragma once
 
 #include "Types.h"
 #include "Socket.h"
@@ -42,5 +41,3 @@ class CNetwork
 		CNetwork& operator = (CNetwork const&) { return *this; };
 		~CNetwork(void);
 };
-
-#endif

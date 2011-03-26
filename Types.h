@@ -5,8 +5,7 @@
 //                                                                           //
 //***************************************************************************//
 
-#ifndef _TYPES_H
-#define _TYPES_H
+#pragma once
 
 // platform
 #if defined(_WIN32)
@@ -25,5 +24,3 @@ typedef unsigned char uchar;
 typedef unsigned short ushort;
 
 typedef void (*func)(void);
-
-#endif

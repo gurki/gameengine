@@ -5,8 +5,7 @@
 //                                                                           //
 //***************************************************************************//
 
-#ifndef _VECTOR3_H
-#define _VECTOR3_H
+#pragma once
 
 #include "Types.h"
 #include <iostream>
@@ -87,5 +86,3 @@ class Vector3
 };
 
 typedef Vector3 vec3;
-
-#endif

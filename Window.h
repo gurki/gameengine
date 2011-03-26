@@ -5,8 +5,7 @@
 //                                                                           //
 //***************************************************************************//
 
-#ifndef _WINDOW_H
-#define _WINDOW_H
+#pragma once
 
 #include "Rectangle.h"
 #include "OpenGL.h"
@@ -60,5 +59,3 @@ class CWindow : public CRectangle
 		CWindow& operator = (CWindow const&) { return *this; };
 		~CWindow(void) {};
 };
-
-#endif
