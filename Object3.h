@@ -9,39 +9,40 @@
 
 #include "MathLib.h"
 #include "Vector3.h"
+#include "OpenGL.h"
 #include "Quaternion.h"
+#include "Transform3.h"
 
 class Object3
 {
 	public:
 
+		// constructors
 		Object3(void);
-		Object3(const vec3& position, const quat& rotation = quat::Identity());
-		Object3(real x, real y, real z, real yaw = 0, real pitch = 0, real roll = 0);
+		Object3(const vec3& position);
+		Object3(real x, real y, real z);
 
-		virtual void Move(const vec3& direction);
-		virtual void Move(real x, real y, real z);
+		// methods
+		virtual void Render(void) const;
 
-		virtual void MoveRelative(const vec3& direction);
-		virtual void MoveRelative(real x, real y, real z);
-
-		virtual void LookAt(const vec3& point);
-		virtual void LookAt(real x, real y, real z);
-
-		virtual void Rotate(const vec3& axis, real angle);
-		virtual void Rotate(real yaw, real pitch, real roll);
-
+		// setter
 		virtual void SetPosition(const vec3& position);
 		virtual void SetPosition(real x, real y, real z);
 		
-		virtual void SetRotation(const quat& rotation);
-		virtual void SetRotation(real yaw, real pitch, real roll);
+		virtual void SetOrientation(const quat& orientation);
+		virtual void SetOrientation(real yaw, real pitch, real roll);
 
+		// getter
 		vec3 GetPosition(void) const;
-		quat GetRotation(void) const;
+		quat GetOrientation(void) const;
 
 	protected:
 
+		void UpdateWorldMatrix(void);
+
+		// variables
 		vec3 pos;
-		quat rot;
+		quat ori;
+
+		trans3 world;
 };

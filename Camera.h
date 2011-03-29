@@ -18,7 +18,8 @@ class Camera : public Object3
 	public:
 		
 		Camera(void);
-		Camera(const vec3& position, const quat& rotation);
+		Camera(const vec3& position);
+		Camera(real x, real y, real z);
 		
 		void SetActive(void) const;
 		void UpdateView(void) const;
@@ -34,6 +35,18 @@ class Camera : public Object3
 		void SetAbsoluteViewport(uint x, uint y, uint width, uint height);
 		void SetRelativeViewport(real x, real y, real width, real height);
 
+		virtual void Move(const vec3& direction);
+		virtual void Move(real x, real y, real z);
+
+		virtual void MoveRelative(const vec3& direction);
+		virtual void MoveRelative(real x, real y, real z);
+
+		virtual void LookAt(const vec3& point);
+		virtual void LookAt(real x, real y, real z);
+
+		virtual void Rotate(const vec3& axis, real angle);
+		virtual void Rotate(real yaw, real pitch, real roll);
+
 		rect GetView(void);
 		
 		static Camera* GetActiveCamera(void);
@@ -46,8 +59,8 @@ class Camera : public Object3
 
 		rect view;
 
-		real ratio;
-		real fovy;
-		real near;
-		real far;
+		real frustum_ratio;
+		real frustum_fovy;
+		real frustum_near;
+		real frustum_far;
 };

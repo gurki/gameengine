@@ -7,118 +7,73 @@
 
 #include "Object3.h"
 
-//***************************************************************************//
-//                                                                           //
-//***************************************************************************//
-
+// constructors
 Object3::Object3(void)
 {
-	pos = vec3::Zero();
-	rot = quat::Identity();
+	SetPosition( vec3::Zero() );
+	SetOrientation( quat::Identity() );
 }
 
-Object3::Object3(const vec3& position, const quat& rotation)
+Object3::Object3(const vec3& position)
 {
-	pos = position;
-	rot = rotation;
+	SetPosition(position);
+	SetOrientation( quat::Identity() );
 }
 
-Object3::Object3(real x, real y, real z, real yaw, real pitch, real roll)
+Object3::Object3(real x, real y, real z)
 {
-	pos = vec3(x, y, z);
-	rot = Quaternion::WithEulerAngles(yaw, pitch, roll);
+	SetPosition(x, y, z);
+	SetOrientation( quat::Identity() );
 }
 
-//***************************************************************************//
-//                                                                           //
-//***************************************************************************//
-
-void Object3::Move(const vec3& vec)
+// methods
+void Object3::Render(void) const
 {
-	pos += vec;
+	glBegin(GL_POINTS);
+
+		glVertex3fv(pos.v); 
+
+	glEnd();
 }
 
-void Object3::Move(real x, real y, real z)
+void Object3::UpdateWorldMatrix(void)
 {
-	pos += vec3(x, y, z);
+	world.SetTranslation(pos);
+	world.SetRotation(ori);
 }
 
-void Object3::MoveRelative(const vec3& vec)
-{
-	pos += rot * vec;
-}
-
-void Object3::MoveRelative(real x, real y, real z)
-{
-	pos += rot * vec3(x, y, z);
-}
-
-void Object3::LookAt(const vec3& point)
-{
-	vec3 d = point - pos;
-
-	real s = deg(atan2r(d.x, d.z)) + 180;
-	real t = deg(asinr(d.y / d.Magnitude()));
-
-	rot = Quaternion::WithEulerAngles(s, t, 0);
-}
-
-void Object3::LookAt(real x, real y, real z)
-{
-	vec3 point(x, y, z);
-
-	vec3 d = point - pos;
-
-	real s = deg(atan2r(d.x, d.z)) + 180;
-	real t = deg(asinr(d.y / d.Magnitude()));
-
-	rot = Quaternion::WithEulerAngles(s, t, 0);
-}
-
-void Object3::Rotate(const vec3& axis, real angle)
-{
-	rot *= Quaternion::WithAxisAngle(axis, angle);
-}
-
-void Object3::Rotate(real yaw, real pitch, real roll)
-{
-	rot *= Quaternion::WithEulerAngles(yaw, pitch, roll);
-}
-
-//***************************************************************************//
-//                                                                           //
-//***************************************************************************//
-
+// setter
 void Object3::SetPosition(const vec3& position)
 {
 	pos = position;
+	world.SetTranslation(pos);
 }
 
 void Object3::SetPosition(real x, real y, real z)
 {
 	pos = vec3(x, y, z);
+	world.SetTranslation(pos);
 }
 
-void Object3::SetRotation(const quat& rotation)
+void Object3::SetOrientation(const quat& orientation)
 {
-	rot = rotation;
+	ori = orientation;
+	world.SetRotation(ori);
 }
 
-void Object3::SetRotation(real yaw, real pitch, real roll)
+void Object3::SetOrientation(real yaw, real pitch, real roll)
 {
-	rot = Quaternion::WithEulerAngles(yaw, pitch, roll);
+	ori = Quaternion::WithEulerAngles(yaw, pitch, roll);
+	world.SetRotation(ori);
 }
 
-//***************************************************************************//
-//                                                                           //
-//***************************************************************************//
-
+// getter
 vec3 Object3::GetPosition(void) const
 {
 	return pos;
 }
 
-quat Object3::GetRotation(void) const
+quat Object3::GetOrientation(void) const
 {
-	return rot;
+	return ori;
 }

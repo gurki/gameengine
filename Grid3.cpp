@@ -14,7 +14,7 @@ Grid3::Grid3(void) : Object3()
 	res = vec2::One();
 }
 
-Grid3::Grid3(const vec3& position, const quat& rotation, const vec2& dimensions, const vec2& resolution) : Object3(position, rotation)
+Grid3::Grid3(const vec3& position, const quat& rotation, const vec2& dimensions, const vec2& resolution) : Object3(position)
 {
 	dim = dimensions;
 	res = resolution;

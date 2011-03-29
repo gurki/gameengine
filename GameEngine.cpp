@@ -15,6 +15,8 @@
 
 void CGameEngine::Initialize(int argc, char** argv)
 {
+	Time.Initialize();
+
 	glutInit(&argc, argv);
 
 	Window.Initialize();
@@ -76,7 +78,7 @@ void CGameEngine::ClearInput(void)
 
 void CGameEngine::IdleFunction(void)
 {
-	Clock.Update();
+	Time.Update();
 
 	InputFunction();
 
@@ -95,6 +97,8 @@ void CGameEngine::InputFunction(void)
 	{
 		GameEngine.End();
 	}
+
+	GameEngine.Input();
 }
 
 void CGameEngine::RenderFunction(void)

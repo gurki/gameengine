@@ -13,18 +13,15 @@
 
 Quaternion::Quaternion(void)
 {
-	w = 0;
-	x = 0;
-	y = 0;
-	z = 0;
+	*this = Identity();
 }
 
-Quaternion::Quaternion(const real* v)
+Quaternion::Quaternion(real w, const vec3& v)
 {
-	w = v[0];
-	x = v[1];
-	y = v[2];
-	z = v[3];
+	this->w = w;
+	this->x = v.x;
+	this->y = v.y;
+	this->z = v.z;
 }
 
 Quaternion::Quaternion(real w, real x, real y, real z)
@@ -186,8 +183,6 @@ Quaternion Quaternion::operator * (const Quaternion& quat) const
 	q.y = w * quat.y - x * quat.z + y * quat.w + z * quat.x;
 	q.z = w * quat.z + x * quat.y - y * quat.x + z * quat.w;
 	
-	q.Normalise();
-	
 	return q;
 }
 
@@ -217,8 +212,6 @@ Quaternion& Quaternion::operator *= (const Quaternion& quat)
    	x = w * quat.x + x * quat.w + y * quat.z - z * quat.y;
 	y = w * quat.y - x * quat.z + y * quat.w + z * quat.x;
 	z = w * quat.z + x * quat.y - y * quat.x + z * quat.w;
-
-	Normalise();
 
 	return *this;
 }

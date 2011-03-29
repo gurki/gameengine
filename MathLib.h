@@ -34,8 +34,8 @@
 #define sign(a) (a >= 0 ? 1 : -1)
 
 // limiting
-#define inf(n, i) ((n < i) ? i : n)
-#define sup(n, s) ((n > s) ? s : n)
+#define inf(n, i) (((n) < (i)) ? (i) : (n))
+#define sup(n, s) (((n) > (s)) ? (s) : (n))
 
 #define limit(n, i, s) (inf( sup(n, s), i ))
 
@@ -96,6 +96,8 @@ inline bool isPrime(int n);
 #define C_PIDIV2     (real)1.57079632679489661923  // pi/2
 #define C_SQRT2DIV2  (real)0.707106781186547524400 // sqrt(2)/2
 #define C_SQRT3DIV2  (real)0.866025403778443864676 // sqrt(3)/2
+
+#define C_SQRT3DIV3  (real)0.577350269189625764509 // sqrt(3)/3
 
 #define C_1DIVE      (real)0.367879441171442321595 // 1/e
 #define C_1DIVPI     (real)0.318309886183790671538 // 1/pi

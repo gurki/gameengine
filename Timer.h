@@ -7,14 +7,20 @@
 
 #pragma once
 
-#define Clock CTimer::GetInstance()
+#include "Types.h"
 
-#include "OpenGL.h"
+#ifdef OS_WINDOWS
+	#include <windows.h>
+#endif
+
+#define Time CTimer::GetInstance()
 
 class CTimer
 {
 	public:
 
+		void Initialize(void);
+		void Start(void);
 		void Update(void);
 
 		real GetRunTime(void) const;
@@ -25,11 +31,14 @@ class CTimer
 		void SetTimescale(real scale);
 
 	private:
-
-		real last;
-		real frame;
+		
+		uint64 start;
+		#ifdef OS_WINDOWS
+			uint64 frequency;
+		#endif
 
 		real fps;
+		real delta;
 		real scale;
 
 	public:

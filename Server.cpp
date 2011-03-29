@@ -43,14 +43,14 @@ void Server::Update(void)
 		Package pack;
 		memcpy(&pack, data, sizeof(pack));
 
-		real mov = Clock.GetTimeDelta() * 5.0f;
+		// real mov = Timer.GetTimeDelta() * 5.0f;
 
-		if(pack.w) clients[i].obj.MoveRelative(vec3::Forward() * mov);
-		if(pack.a) clients[i].obj.MoveRelative(-vec3::Right() * mov);
-		if(pack.s) clients[i].obj.MoveRelative(-vec3::Forward() * mov);
-		if(pack.d) clients[i].obj.MoveRelative(vec3::Right() * mov);
+		// if(pack.w) clients[i].obj.MoveRelative(vec3::Forward() * mov);
+		// if(pack.a) clients[i].obj.MoveRelative(-vec3::Right() * mov);
+		// if(pack.s) clients[i].obj.MoveRelative(-vec3::Forward() * mov);
+		// if(pack.d) clients[i].obj.MoveRelative(vec3::Right() * mov);
 
-		clients[i].obj.Rotate(pack.dx, 0, 0);
+		// clients[i].obj.Rotate(pack.dx, 0, 0);
 	}
 	
 	// send data

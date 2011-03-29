@@ -9,7 +9,6 @@
 
 #include "Types.h"
 #include "Vector3.h"
-// #include "Quaternion.h"
 
 #include <iostream>
 
@@ -62,10 +61,10 @@ class Matrix3x3
 		// static members
 		static const Matrix3x3& Zero(void);
 		static const Matrix3x3& Identity(void);
-/*
-		// convertions
-		static Matrix3x3 WithQuaternion(const Quaternion& q);
-*/
+
+		// setter
+		void SetDiagonal(real m11, real m22, real m33);
+
 		// iostream
 		friend ostream& operator << (ostream& out, const Matrix3x3& m);
 		friend istream& operator >> (istream& in, Matrix3x3& m);
@@ -75,9 +74,9 @@ class Matrix3x3
 		{
 			real v[9];
 
-			struct { real m11, m12, m13;
-					 real m21, m22, m23;
-					 real m31, m32, m33; };
+			struct { real m11, m21, m31;
+					 real m12, m22, m32;
+					 real m13, m23, m33; };
 		};
 };
 

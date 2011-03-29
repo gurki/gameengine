@@ -315,6 +315,21 @@ Matrix3x3& Matrix3x3::Transpose(void)
 	return *this;
 }
 
+// setter
+void Matrix3x3::SetDiagonal(real m11, real m22, real m33)
+{
+	this->m11 = m11;
+	this->m22 = m22;
+	this->m33 = m33;
+
+	this->m12 = 0;
+	this->m13 = 0;
+	this->m21 = 0;
+	this->m23 = 0;
+	this->m31 = 0;
+	this->m32 = 0;
+}
+
 // static members
 const Matrix3x3& Matrix3x3::Zero(void)
 {
@@ -333,27 +348,7 @@ const Matrix3x3& Matrix3x3::Identity(void)
 
 	return m;
 }
-/*
-// convertions
-Matrix3x3 Matrix3x3::WithQuaternion(const Quaternion& q)
-{
-	Matrix3x3 r;
 
-	r.m11 = 1 - 2 * (q.y * q.y - q.z * q.z);
-	r.m12 =     2 * (q.x * q.y + q.z * q.w);
-	r.m13 =     2 * (q.x * q.z - q.y * q.w);
-
-	r.m21 =     2 * (q.x * q.y - q.z * q.w);
-	r.m22 = 1 - 2 * (q.x * q.x + q.z * q.z);
-	r.m23 =     2 * (q.y * q.z + q.x * q.w);
-
-	r.m31 =     2 * (q.x * q.z + q.y * q.w);
-	r.m32 =     2 * (q.y * q.z - q.x * q.w);
-	r.m33 = 1 - 2 * (q.x * q.x + q.y * q.y);
-
-	return r;
-}
-*/
 // iostream
 ostream& operator << (ostream& out, const Matrix3x3& m)
 {

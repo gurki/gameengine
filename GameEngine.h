@@ -12,6 +12,7 @@
 #include "Color.h"
 #include "Window.h"
 #include "Timer.h"
+#include "Camera.h"
 
 #include "Types.h"
 
@@ -45,6 +46,7 @@ class CGameEngine
 		bool IsPaused(void);
 
 		virtual void Idle(void) const;
+		virtual void Input(void) const;
 		virtual void Render(void) const;
 
 	private:

@@ -55,12 +55,12 @@ void Triangle::SetSize(real size)
 {
 	this->size = inf(size, 0);
 	
-	real s = size * 0.5f;
-	real h = C_SQRT3DIV2 * s;
-	
+	real s = this->size * 0.5;
+	real h = (C_SQRT3DIV2 * this->size) / 3.0;
+
 	d[0] = vec2(-s,-h);
 	d[1] = vec2( s,-h);
-	d[2] = vec2( 0, h);
+	d[2] = vec2( 0, 2 * h);
 }
 		
 // getter

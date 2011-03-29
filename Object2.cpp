@@ -29,19 +29,11 @@ Object2::Object2(const vec2& position)
 // methods
 void Object2::Render(void) const
 {
-	glPushMatrix();
-	glTranslatef(pos.x, pos.y, 0);
-	glRotatef(rot, 0, 0, 1);
-	
-		glBegin(GL_POINTS);
+	glBegin(GL_POINTS);
 		
-			glNormal3f(0, 0, 1);
+		glVertex2fv(pos.v);
 		
-			glVertex2f(0, 0);
-		
-		glEnd();
-	
-	glPopMatrix();
+	glEnd();
 }
 		
 // setter

@@ -6,7 +6,7 @@
 //***************************************************************************//
 
 #pragma once
-
+/*
 #include "Types.h"
 #include "Particle.h"
 
@@ -49,3 +49,4 @@ class CIntegrator
 		CIntegrator& operator = (CIntegrator const&) { return *this; };
 		~CIntegrator(void) {};
 };
+*/

@@ -36,7 +36,7 @@ class Quaternion
 
 		// constructors
 		Quaternion(void);
-		Quaternion(const real* v);
+		Quaternion(real w, const vec3& v);
 		Quaternion(real w, real x, real y, real z);
 
 		// assign operators

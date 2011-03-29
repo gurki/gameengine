@@ -138,7 +138,7 @@ void CGameEngine::Idle(void) const
 
 	const real ts = 0.01;
 	static real t = 0;
-	real dt = Clock.GetTimeDelta();
+	real dt = Timer.GetTimeDelta();
 
 	t += dt;
 	
