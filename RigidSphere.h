@@ -8,16 +8,16 @@
 #pragma once
 
 #include "RigidBody3.h"
-#include "Cylinder.h"
+#include "Sphere.h"
 
-class RigidCylinder : public RigidBody3, public Cylinder
+class RigidSphere : public RigidBody3, public Sphere
 {
 	public:
 		
 		// construcotrs
-		RigidCylinder(void);
-		RigidCylinder(real x, real y, real z, real height, real radius);
-		RigidCylinder(const vec3& position, real height, real radius);
+		RigidSphere(void);
+		RigidSphere(real x, real y, real z, real radius);
+		RigidSphere(const vec3& position, real radius);
 	
 		// methods
 		void Render(void) const;	
@@ -26,6 +26,5 @@ class RigidCylinder : public RigidBody3, public Cylinder
 		void UpdateInertiaTensor(void);
 
 		// setter
-		void SetHeight(real height);
 		void SetRadius(real radius);
 };

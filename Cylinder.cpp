@@ -10,8 +10,8 @@
 
 Cylinder::Cylinder(void) : Object3()
 {
-	SetHeight(5);
-	SetRadius(0.5);
+	SetHeight(5.0f);
+	SetRadius(0.5f);
 }
 
 Cylinder::Cylinder(const vec3& position, real height, real radius) : Object3(position)

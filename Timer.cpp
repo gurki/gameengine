@@ -6,6 +6,7 @@
 //***************************************************************************//
 
 #include "Timer.h"
+#include "OpenGL.h"
 
 CTimer::CTimer(void)
 {
@@ -13,7 +14,7 @@ CTimer::CTimer(void)
 		QueryPerformanceCounter((LARGE_INTEGER*)&start);
 		QueryPerformanceFrequency((LARGE_INTEGER*)&frequency);
 	#else
-		Microseconds((UnsignedWide*)&start);
+		// Microseconds((UnsignedWide*)&start);
 	#endif
 
 	delta = 0;
@@ -54,9 +55,12 @@ real CTimer::GetRunTime(void) const
 		QueryPerformanceCounter((LARGE_INTEGER*)&counter);
 		return (real)( (counter - start) / double(frequency) );
 	#else
-	    uint64 counter = 0;
+		return glutGet(GLUT_ELAPSED_TIME) * 0.001f;
+	    /*
+		uint64 counter = 0;
 		Microseconds((UnsignedWide*)&counter);
 		return (real)( (counter - start) * 0.0000001 );
+		*/
 	#endif
 }
 

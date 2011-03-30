@@ -14,7 +14,7 @@ RigidCylinder::RigidCylinder(void) : RigidBody3(), Cylinder()
 	UpdateInertiaTensor();
 }
 
-RigidCylinder::RigidCylinder(real x, real y, real z, real height, real radius) : RigidBody3(), Cylinder(vec3(x, y, z), radius, height)
+RigidCylinder::RigidCylinder(real x, real y, real z, real height, real radius) : RigidBody3(), Cylinder(vec3(x, y, z), height, radius)
 {
 	UpdateMass();
 	UpdateInertiaTensor();
@@ -45,10 +45,9 @@ void RigidCylinder::UpdateInertiaTensor(void)
 	real hh = height * height;
 
 	real m11 = factor * (3.0f * rr + hh);
-	real m22 = factor * (3.0f * rr + hh);
-	real m33 = 0.5f * rr / inverseMass;
+	real m22 = 0.5f * rr / inverseMass;
 
-	inverseInertiaTensor.SetDiagonal(m11, m22, m33);
+	inverseInertiaTensor.SetDiagonal(m11, m22, m11);
 	inverseInertiaTensor.Inverse();
 }
 

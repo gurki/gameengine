@@ -32,8 +32,8 @@ class CTimer
 
 	private:
 		
-		uint64 start;
 		#ifdef OS_WINDOWS
+		    uint64 start;
 			uint64 frequency;
 		#endif
 

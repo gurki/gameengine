@@ -7,25 +7,27 @@
 
 #pragma once
 
-#include "RigidBody3.h"
-#include "Cylinder.h"
+#include "Object3.h"
 
-class RigidCylinder : public RigidBody3, public Cylinder
+class Sphere : public virtual Object3
 {
 	public:
-		
-		// construcotrs
-		RigidCylinder(void);
-		RigidCylinder(real x, real y, real z, real height, real radius);
-		RigidCylinder(const vec3& position, real height, real radius);
-	
+
+		// constructors
+		Sphere(void);
+		Sphere(const vec3& position, real radius);
+
 		// methods
-		void Render(void) const;	
-
-		void UpdateMass(void);
-		void UpdateInertiaTensor(void);
-
+		void Render(void) const;
+				
 		// setter
-		void SetHeight(real height);
-		void SetRadius(real radius);
+		virtual void SetRadius(real radius);
+		
+		// getter
+		real GetRadius(void) const;
+
+	protected:
+
+		// variables
+		real radius;
 };

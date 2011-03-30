@@ -1,6 +1,6 @@
 //***************************************************************************//
 //                                                                           //
-//                          Gurki Media PCylindeructions                          //
+//                          Gurki Media Productions                          //
 //                             (C) Tobias Gurdan                             //
 //                                                                           //
 //***************************************************************************//
@@ -27,8 +27,8 @@ typedef unsigned short ushort;
 
 #ifdef OS_WINDOWS
 	typedef unsigned __int64 uint64;
-#elif
-	typedef UInt64 uint64;
+#else
+	// typedef UInt64 uint64;
 #endif
 
 typedef void (*func)(void);

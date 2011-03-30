@@ -15,10 +15,17 @@ Matrix3x3::Matrix3x3(void)
 
 Matrix3x3::Matrix3x3(const real* v)
 {
-	for(uint i = 0; i < 9; i++)
-	{
-		this->v[i] = v[i];
-	}
+	this->m11 = v[0];
+	this->m12 = v[1];
+	this->m13 = v[2];
+
+	this->m21 = v[3];
+	this->m22 = v[4];
+	this->m23 = v[5];
+
+	this->m31 = v[6];
+	this->m32 = v[7];
+	this->m33 = v[8];
 }
 
 Matrix3x3::Matrix3x3(real m11, real m12, real m13,
