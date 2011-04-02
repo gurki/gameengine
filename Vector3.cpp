@@ -265,6 +265,24 @@ istream& operator >> (istream& in, Vector3& vec)
 }	
 
 // static members
+const Vector3 Vector3::X(void)
+{
+	static const Vector3 vec(1, 0, 0);
+	return vec;
+}
+
+const Vector3 Vector3::Y(void)
+{
+	static const Vector3 vec(0, 1, 0);
+	return vec;
+}
+
+const Vector3 Vector3::Z(void)
+{
+	static const Vector3 vec(0, 0, 1);
+	return vec;
+}
+
 const Vector3 Vector3::Up(void)
 {
 	static const Vector3 vec( 0, 1, 0);

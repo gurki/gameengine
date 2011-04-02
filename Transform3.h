@@ -31,11 +31,21 @@ class Transform3 : public Matrix4x4
 	
 		// setter
 		Transform3& SetRotation(const quat& rotation);
+		Transform3& SetRotationAboutAxis(const vec3& axis, real radians);
 		Transform3& SetTranslation(const vec3& translation);
 
 		// getter
 		mat3 GetRotation(void) const;
 		vec3 GetTranslation(void) const;
+		
+		// static getter
+		static Transform3 With90DegreeRotationAboutX(void);
+		static Transform3 With90DegreeRotationAboutY(void);
+		static Transform3 With90DegreeRotationAboutZ(void);
+
+		static Transform3 With180DegreeRotationAboutX(void);
+		static Transform3 With180DegreeRotationAboutY(void);
+		static Transform3 With180DegreeRotationAboutZ(void);
 };
 
 typedef Transform3 trans3;

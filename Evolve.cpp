@@ -8,15 +8,21 @@
 #include "GameEngine.h"
 
 #include "Grid3.h"
+#include "RigidBody3.h"
 #include "RigidBox.h"
 #include "RigidCylinder.h"
 #include "RigidSphere.h"
 
 Camera cam;
 Grid3 grid;
-RigidBox box, cube;
+
+#define k 3
+
+RigidBox box;
+RigidBox stick;
 RigidCylinder rod;
-RigidSphere sphere;
+
+RigidBody3* bodies[k];
 
 int main(int argc, char* argv[])
 {
@@ -29,16 +35,20 @@ int main(int argc, char* argv[])
 
 	grid.SetDimensions(10, 10);
 
-	cube.SetPosition(5, 2, 0);
-	cube.SetDimensions(2, 2, 2);
+	rod.SetRadius(0.5f);
+	rod.SetHeight(2.0f);
+	rod.SetPosition(3.0f, 0.0f, 0.0f);
 
-	box.SetPosition(-5, 2, 0);
-	box.SetDimensions(3, 2, 1);
-	
-	sphere.SetRadius(2.0f);
-	
-	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	box.SetDimensions(2.0f, 2.0f, 2.0f);
+	box.SetPosition(0.0f, 0.0f, 0.0f);
 
+	stick.SetDimensions(0.5f, 2.0f, 0.5f);
+	stick.SetPosition(-3.0f, 0.0f, 0.0f);
+	
+	bodies[0] = &rod;
+	bodies[1] = &box;
+	bodies[2] = &stick;
+	
 	// start game
 	GameEngine.Start();
 	return 0;
@@ -50,74 +60,49 @@ void CGameEngine::Render(void) const
 	glLoadIdentity();
 	
 	cam.SetActive();
+
 	Color::WithWhite().Bind();
 	grid.Render();
 
-	// box.Render();
-	// cube.Render();
-	// rod.Render();
-	sphere.Render();
-
+	Color::WithGreen().Desaturate(0.5f).Bind();
+	bodies[0]->Render();
+	
+	Color::WithOrange().Desaturate(0.5f).Bind();
+	bodies[1]->Render();
+	
+	Color::WithYellow().Desaturate(0.5f).Bind();
+	bodies[2]->Render();
+	
 	glutSwapBuffers();
+
+	glEnable(GL_LIGHTING);
 }
 
 void CGameEngine::Idle(void) const
 {
-	real n = Time.GetTimeDelta() * 10000;
+	real n = 10;
 	
 	// apply forces
-	vec3 torquex(n, 0.0f, 0.0f);
-	vec3 torquey(0.0f, n, 0.0f);
-	vec3 torquez(0.0f, 0.0f, n);
-
-	if(Keyboard.KeyIsPressed('x'))
-	{
-		box.ApplyRelativeTorque(torquex);
-		cube.ApplyRelativeTorque(torquex);
-		rod.ApplyRelativeTorque(torquex);
-		sphere.ApplyRelativeTorque(torquex);
-	}
-
-	if(Keyboard.KeyIsPressed('X'))
-	{
-		box.ApplyRelativeTorque(-torquex);
-		cube.ApplyRelativeTorque(-torquex);
-		rod.ApplyRelativeTorque(-torquex);
-		sphere.ApplyRelativeTorque(-torquex);
-	}
+	vec3 point(0.0f, 2.0f, 0.0f);
 	
-	if(Keyboard.KeyIsPressed('y'))	
-	{
-		box.ApplyRelativeTorque(torquey);
-		cube.ApplyRelativeTorque(torquey);
-		rod.ApplyRelativeTorque(torquey);
-		sphere.ApplyRelativeTorque(torquey);
-	}
+	if(Keyboard.KeyIsPressed('a')) for(uint i = 0; i < k; i++) bodies[i]->ApplyTorque( vec3::X() * n);
+	if(Keyboard.KeyIsPressed('A')) for(uint i = 0; i < k; i++) bodies[i]->ApplyTorque(-vec3::X() * n);
+	
+	if(Keyboard.KeyIsPressed('s')) for(uint i = 0; i < k; i++) bodies[i]->ApplyTorque( vec3::Y() * n);
+	if(Keyboard.KeyIsPressed('S')) for(uint i = 0; i < k; i++) bodies[i]->ApplyTorque(-vec3::Y() * n);
 
-	if(Keyboard.KeyIsPressed('Y'))	
-	{
-		box.ApplyRelativeTorque(-torquey);
-		cube.ApplyRelativeTorque(-torquey);
-		rod.ApplyRelativeTorque(-torquey);
-		sphere.ApplyRelativeTorque(-torquey);		
-	}
+	if(Keyboard.KeyIsPressed('d')) for(uint i = 0; i < k; i++) bodies[i]->ApplyTorque( vec3::Z() * n);
+	if(Keyboard.KeyIsPressed('D')) for(uint i = 0; i < k; i++) bodies[i]->ApplyTorque(-vec3::Z() * n);		
 	
-	if(Keyboard.KeyIsPressed('z'))	
-	{
-		box.ApplyRelativeTorque(-torquez);
-		cube.ApplyRelativeTorque(-torquez);
-		rod.ApplyRelativeTorque(-torquez);
-		sphere.ApplyRelativeTorque(-torquez);
-	}
+	if(Keyboard.KeyIsPressed('q')) for(uint i = 0; i < k; i++) bodies[i]->ApplyForceAtBodyPoint( vec3::X() * n, point);
+	if(Keyboard.KeyIsPressed('Q')) for(uint i = 0; i < k; i++) bodies[i]->ApplyForceAtBodyPoint(-vec3::X() * n, point);
 	
-	if(Keyboard.KeyIsPressed('Z'))	
-	{
-		box.ApplyRelativeTorque(-torquez);
-		cube.ApplyRelativeTorque(-torquez);
-		rod.ApplyRelativeTorque(-torquez);
-		sphere.ApplyRelativeTorque(-torquez);
-	}
-		
+	if(Keyboard.KeyIsPressed('w')) for(uint i = 0; i < k; i++) bodies[i]->ApplyForceAtBodyPoint( vec3::Y() * n, point);
+	if(Keyboard.KeyIsPressed('W')) for(uint i = 0; i < k; i++) bodies[i]->ApplyForceAtBodyPoint(-vec3::Y() * n, point);
+
+	if(Keyboard.KeyIsPressed('e')) for(uint i = 0; i < k; i++) bodies[i]->ApplyForceAtBodyPoint( vec3::Z() * n, point);
+	if(Keyboard.KeyIsPressed('E')) for(uint i = 0; i < k; i++) bodies[i]->ApplyForceAtBodyPoint(-vec3::Z() * n, point);		
+
 	// physics
 	static const real timestep = 0.01f;
 	static real dt = 0;
@@ -126,19 +111,12 @@ void CGameEngine::Idle(void) const
 
 	while(dt >= 0)
 	{
-		box.Update(timestep);
-		cube.Update(timestep);
-		rod.Update(timestep);
-		sphere.Update(timestep);
+		for(uint i = 0; i < k; i++) bodies[i]->Update(timestep);
 
 		dt -= timestep;
 	}
 
-	box.ClearAccumulators();
-	cube.ClearAccumulators();
-	rod.ClearAccumulators();
-	sphere.ClearAccumulators();
-	
+	for(uint i = 0; i < k; i++) bodies[i]->ClearAccumulators();
 }
 
 void CGameEngine::Input(void) const
@@ -146,4 +124,12 @@ void CGameEngine::Input(void) const
 	// pause game
 	if(Keyboard.KeyWasPressed('u')) GameEngine.Unpause();
 	if(Keyboard.KeyWasPressed('p')) GameEngine.Pause();
+
+	if(Keyboard.KeyWasPressed('r')) 
+	{
+		for(uint i = 0; i < k; i++) bodies[i]->SetOrientation(0, 0, 0);
+		for(uint i = 0; i < k; i++) bodies[i]->SetAngularVelocity(vec3::Zero());
+	}
+	
+	if(Keyboard.KeyWasPressed('f')) for(uint i = 0; i < k; i++) bodies[i]->SetAngularVelocity(vec3::Zero());
 }

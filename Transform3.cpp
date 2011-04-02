@@ -90,7 +90,6 @@ vec3 Transform3::FromLocalToWorld(const vec3& v) const
 // setter
 Transform3& Transform3::SetRotation(const quat& q)
 {
-    real sqw = q.w * q.w;
     real sqx = q.x * q.x;
     real sqy = q.y * q.y;
     real sqz = q.z * q.z;
@@ -118,6 +117,28 @@ Transform3& Transform3::SetRotation(const quat& q)
     m23 = 2.0f * (tmp1 - tmp2);    
 	
 	return *this;
+}
+
+Transform3& Transform3::SetRotationAboutAxis(const vec3& axis, real radians)
+{
+	vec3 n = axis.Normalised();
+	real c = cos(radians);
+	real s = sin(radians);
+	real t = 1.0f - c; 
+	
+	m11 = t * n.x * n.x + c;
+	m12 = t * n.x * n.y - n.z * s;
+	m13 = t * n.x * n.z + n.y * s;
+	
+	m21 = t * n.x * n.y + n.z * s;
+	m22 = t * n.y * n.y + c;
+	m23 = t * n.y * n.z - n.x * s;
+	
+	m31 = t * n.x * n.z - n.y * s;
+	m32 = t * n.y * n.z + n.x * s;
+	m33 = t * n.z * n.z + c;
+	
+	return *this; 
 }
 
 Transform3& Transform3::SetTranslation(const vec3& translation)
@@ -157,5 +178,60 @@ vec3 Transform3::GetTranslation(void) const
 	r.y = m24;
 	r.z = m34;
 
+	return r;
+}
+
+// static getter
+Transform3 Transform3::With90DegreeRotationAboutX(void)
+{
+	static Transform3 r;
+	
+	r.SetRotationAboutAxis(vec3(1, 0, 0), C_PIDIV2);
+	
+	return r;
+}
+
+Transform3 Transform3::With90DegreeRotationAboutY(void)
+{
+	static Transform3 r;
+	
+	r.SetRotationAboutAxis(vec3(0, 1, 0), C_PIDIV2);
+	
+	return r;
+}
+
+Transform3 Transform3::With90DegreeRotationAboutZ(void)
+{
+	static Transform3 r;
+	
+	r.SetRotationAboutAxis(vec3(0, 0, 1), C_PIDIV2);
+	
+	return r;
+}
+
+Transform3 Transform3::With180DegreeRotationAboutX(void)
+{
+	static Transform3 r;
+	
+	r.SetRotationAboutAxis(vec3(1, 0, 0), C_PIDIV2);
+	
+	return r;
+}
+
+Transform3 Transform3::With180DegreeRotationAboutY(void)
+{
+	static Transform3 r;
+	
+	r.SetRotationAboutAxis(vec3(0, 1, 0), C_PI);
+	
+	return r;
+}
+
+Transform3 Transform3::With180DegreeRotationAboutZ(void)
+{
+	static Transform3 r;
+	
+	r.SetRotationAboutAxis(vec3(0, 0, 1), C_PI);
+	
 	return r;
 }

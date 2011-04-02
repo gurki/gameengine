@@ -25,14 +25,19 @@ class RigidBody3 : public virtual Object3
 
 		// apply physics
 		void ApplyForceAtCenter(const vec3& force);
-		void ApplyRelativeForce(const vec3& force, const vec3& point);
+		void ApplyForceAtBodyPoint(const vec3& force, const vec3& point);
 
 		void ApplyTorque(const vec3& torque);
-		void ApplyRelativeTorque(const vec3& torque);
+
+		// setter
+		void SetLinearVelocity(const vec3& velocity);
+		void SetAngularVelocity(const vec3& velocity);
+
+		void SetMass(real mass);
 		
 	protected:
 
-		virtual void UpdateInertiaTensor(void) = 0;
+		virtual void UpdateInertiaTensor(void);
 
 		// primary
 		vec3 linearVelocity;

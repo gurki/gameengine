@@ -6,6 +6,7 @@
 //***************************************************************************//
 
 #include "RigidBody3.h"
+#include "Color.h"
 
 RigidBody3::RigidBody3(void) : Object3()
 {
@@ -18,8 +19,7 @@ RigidBody3::RigidBody3(void) : Object3()
 
 	// constant
 	inverseMass = 1.0f;
-	inverseInertiaTensor.SetDiagonal(0.4f, 0.4f, 0.4f);
-	inverseInertiaTensor.Inverse();
+	UpdateInertiaTensor();
 	
 	// derived
 	UpdateWorldMatrix();
@@ -30,20 +30,15 @@ void RigidBody3::ApplyForceAtCenter(const vec3& force)
 	forces += force;
 }
 
-void RigidBody3::ApplyRelativeForce(const vec3& force, const vec3& point)
+void RigidBody3::ApplyForceAtBodyPoint(const vec3& force, const vec3& point)
 {
-	forces += force;
-	torques += force.Cross(ori * point);
+	// forces += force;
+	torques += force.Cross( world.GetRotation() * point );
 }
 
 void RigidBody3::ApplyTorque(const vec3& torque)
 {
 	torques += torque;
-}
-
-void RigidBody3::ApplyRelativeTorque(const vec3& torque)
-{
-	torques += ori * torque;
 }
 
 void RigidBody3::Render(void) const
@@ -59,20 +54,43 @@ void RigidBody3::ClearAccumulators(void)
 
 void RigidBody3::Update(real dt)
 {
+	// damping
+	real linearDamping = 0.97f;
+	real angularDamping = 0.97f;
+
 	// linear movement
 	vec3 temp = forces * inverseMass * dt;
 
-	linearVelocity = temp + linearVelocity;
+	linearVelocity = temp + linearVelocity * linearDamping;
 	pos = 0.5f * temp * dt + linearVelocity * dt + pos;
 	
 	// angular movement
-	temp = torques * world.GetRotation() * inverseInertiaTensor * dt;
+	temp = torques * (world.GetRotation() * inverseInertiaTensor * world.GetRotation().Transposed()) * dt;
 
-	angularVelocity = temp + angularVelocity;
+	angularVelocity = temp + angularVelocity * angularDamping;
 	ori =  0.5 * quat(0, 0.5f * temp + angularVelocity) * ori * dt + ori;
 
 	ori.Normalise();
 	
 	// update derived data
 	UpdateWorldMatrix();
+}
+
+// setter
+void RigidBody3::SetLinearVelocity(const vec3& velocity)
+{
+	linearVelocity = velocity;
+}
+
+void RigidBody3::SetAngularVelocity(const vec3& velocity)
+{
+	angularVelocity = velocity;
+}
+
+void RigidBody3::UpdateInertiaTensor(void)
+{
+	real m11 = 0.4f / inverseMass; // 2/5 m r^2 (sphere, r = 1)
+
+	inverseInertiaTensor.SetDiagonal(m11, m11, m11);
+	inverseInertiaTensor.Inverse();
 }
