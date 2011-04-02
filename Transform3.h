@@ -26,8 +26,11 @@ class Transform3 : public Matrix4x4
 		friend vec3 operator * (const vec3& v, const Transform3& t);
 	
 		// methods
-		vec3 FromWorldToLocal(const vec3& v) const;
-		vec3 FromLocalToWorld(const vec3& v) const;
+		vec3 TransformFromWorldToLocal(const vec3& v) const;
+		vec3 TransformFromLocalToWorld(const vec3& v) const;
+		
+		vec3 RotateFromLocalToWorld(const vec3& v) const;
+		mat3 RotateFromLocalToWorld(const mat3& v) const;
 	
 		// setter
 		Transform3& SetRotation(const quat& rotation);

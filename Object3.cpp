@@ -77,3 +77,8 @@ quat Object3::GetOrientation(void) const
 {
 	return ori;
 }
+
+vec3 Object3::GetPointOnSurface(real u, real v, real w) const
+{
+	return vec3::Zero();	
+}

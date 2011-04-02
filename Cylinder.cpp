@@ -7,6 +7,7 @@
 
 #include "Cylinder.h"
 #include "Color.h"
+#include "Vector2.h"
 
 Cylinder::Cylinder(void) : Object3()
 {
@@ -23,7 +24,6 @@ Cylinder::Cylinder(const vec3& position, real height, real radius) : Object3(pos
 void Cylinder::Render(void) const
 {
 	static const real n = 20;
-	real h = height / 2.0f;
 	real ratio, n1, n2;
 
 	glPushMatrix();
@@ -40,8 +40,8 @@ void Cylinder::Render(void) const
 			n2 = radius * sin(ratio);
 
 			glNormal3f(n1, 0, n2);
-			glVertex3f(n1, h, n2);
-			glVertex3f(n1,-h, n2);
+			glVertex3f(n1, height, n2);
+			glVertex3f(n1,-height, n2);
 		}
 
 	glEnd();
@@ -50,7 +50,7 @@ void Cylinder::Render(void) const
 	glBegin(GL_TRIANGLE_FAN);
 
 		glNormal3f(0, 1, 0);
-		glVertex3f(0, h, 0);
+		glVertex3f(0, height, 0);
 
 		for(real i = 0; i <= n; i++)
 		{
@@ -59,7 +59,7 @@ void Cylinder::Render(void) const
 			n1 = radius * cos(ratio);
 			n2 = radius * sin(ratio);
 
-			glVertex3f(n1, h, n2);
+			glVertex3f(n1, height, n2);
 		}
 
 	glEnd();
@@ -68,7 +68,7 @@ void Cylinder::Render(void) const
 	glBegin(GL_TRIANGLE_FAN);
 
 		glNormal3f(0,-1, 0);
-		glVertex3f(0,-h, 0);
+		glVertex3f(0,-height, 0);
 
 		for(real i = 0; i <= n; i++)
 		{
@@ -77,7 +77,7 @@ void Cylinder::Render(void) const
 			n1 = radius * cos(ratio);
 			n2 = radius * sin(ratio);
 
-			glVertex3f(n1,-h, n2);
+			glVertex3f(n1,-height, n2);
 		}
 
 	glEnd();
@@ -88,6 +88,8 @@ void Cylinder::Render(void) const
 // setter
 void Cylinder::SetHeight(real height)
 {
+	height *= 0.5f;
+	
 	this->height = inf(height, 0);
 }
 
@@ -99,10 +101,26 @@ void Cylinder::SetRadius(real radius)
 // getter
 real Cylinder::GetHeight(void) const
 {
-	return height;
+	return height * 2.0f;
 }
 
 real Cylinder::GetRadius(void) const
 {
 	return radius;
+}
+
+// getter
+vec3 Cylinder::GetPointOnSurface(real u, real v, real w) const
+{
+	vec2 n(u, w);
+	
+	n.Normalise();
+	
+	vec3 r;
+	
+	r.x = n.x * radius;
+	r.y = v * height;
+	r.z = n.y * radius;
+	
+	return r;
 }

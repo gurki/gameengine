@@ -15,17 +15,17 @@ class Box : public virtual Object3
 
 		// constructors
 		Box(void);
-		Box(const vec3& position, const vec3& dimensions);
+		Box(const vec3& position, real width, real height, real depth);
 
 		// methods
 		void Render(void) const;
 				
 		// setter
 		virtual void SetDimensions(real width, real height, real depth);
-		virtual void SetDimensions(const vec3& dimensions);
 		
 		// getter
 		vec3 GetDimensions(void) const;
+		vec3 GetPointOnSurface(real u, real v, real w) const;
 
 	protected:
 

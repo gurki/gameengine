@@ -39,7 +39,7 @@ int main(int argc, char* argv[])
 	rod.SetHeight(2.0f);
 	rod.SetPosition(3.0f, 0.0f, 0.0f);
 
-	box.SetDimensions(2.0f, 2.0f, 2.0f);
+	box.SetDimensions(1.0f, 1.0f, 1.0f);
 	box.SetPosition(0.0f, 0.0f, 0.0f);
 
 	stick.SetDimensions(0.5f, 2.0f, 0.5f);
@@ -83,7 +83,8 @@ void CGameEngine::Idle(void) const
 	real n = 10;
 	
 	// apply forces
-	vec3 point(0.0f, 2.0f, 0.0f);
+	vec3 points[k];
+	for(uint i = 0; i < k; i++) points[i] = bodies[i]->GetPointOnSurface(0, 1, 0);
 	
 	if(Keyboard.KeyIsPressed('a')) for(uint i = 0; i < k; i++) bodies[i]->ApplyTorque( vec3::X() * n);
 	if(Keyboard.KeyIsPressed('A')) for(uint i = 0; i < k; i++) bodies[i]->ApplyTorque(-vec3::X() * n);
@@ -94,14 +95,14 @@ void CGameEngine::Idle(void) const
 	if(Keyboard.KeyIsPressed('d')) for(uint i = 0; i < k; i++) bodies[i]->ApplyTorque( vec3::Z() * n);
 	if(Keyboard.KeyIsPressed('D')) for(uint i = 0; i < k; i++) bodies[i]->ApplyTorque(-vec3::Z() * n);		
 	
-	if(Keyboard.KeyIsPressed('q')) for(uint i = 0; i < k; i++) bodies[i]->ApplyForceAtBodyPoint( vec3::X() * n, point);
-	if(Keyboard.KeyIsPressed('Q')) for(uint i = 0; i < k; i++) bodies[i]->ApplyForceAtBodyPoint(-vec3::X() * n, point);
+	if(Keyboard.KeyIsPressed('q')) for(uint i = 0; i < k; i++) bodies[i]->ApplyForceAtBodyPoint( vec3::X() * n, points[i]);
+	if(Keyboard.KeyIsPressed('Q')) for(uint i = 0; i < k; i++) bodies[i]->ApplyForceAtBodyPoint(-vec3::X() * n, points[i]);
 	
-	if(Keyboard.KeyIsPressed('w')) for(uint i = 0; i < k; i++) bodies[i]->ApplyForceAtBodyPoint( vec3::Y() * n, point);
-	if(Keyboard.KeyIsPressed('W')) for(uint i = 0; i < k; i++) bodies[i]->ApplyForceAtBodyPoint(-vec3::Y() * n, point);
+	if(Keyboard.KeyIsPressed('w')) for(uint i = 0; i < k; i++) bodies[i]->ApplyForceAtBodyPoint( vec3::Y() * n, points[i]);
+	if(Keyboard.KeyIsPressed('W')) for(uint i = 0; i < k; i++) bodies[i]->ApplyForceAtBodyPoint(-vec3::Y() * n, points[i]);
 
-	if(Keyboard.KeyIsPressed('e')) for(uint i = 0; i < k; i++) bodies[i]->ApplyForceAtBodyPoint( vec3::Z() * n, point);
-	if(Keyboard.KeyIsPressed('E')) for(uint i = 0; i < k; i++) bodies[i]->ApplyForceAtBodyPoint(-vec3::Z() * n, point);		
+	if(Keyboard.KeyIsPressed('e')) for(uint i = 0; i < k; i++) bodies[i]->ApplyForceAtBodyPoint( vec3::Z() * n, points[i]);
+	if(Keyboard.KeyIsPressed('E')) for(uint i = 0; i < k; i++) bodies[i]->ApplyForceAtBodyPoint(-vec3::Z() * n, points[i]);		
 
 	// physics
 	static const real timestep = 0.01f;

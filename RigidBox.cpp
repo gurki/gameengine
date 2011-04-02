@@ -14,13 +14,7 @@ RigidBox::RigidBox(void) : RigidBody3(), Box()
 	UpdateInertiaTensor();
 }
 
-RigidBox::RigidBox(real x, real y, real z, real width, real height, real depth) : RigidBody3(), Box(vec3(x, y, z), vec3(width, height, depth))
-{
-	UpdateMass();
-	UpdateInertiaTensor();
-}
-
-RigidBox::RigidBox(const vec3& position, const vec3& dimensions) : RigidBody3(), Box(position, dimensions)
+RigidBox::RigidBox(real x, real y, real z, real width, real height, real depth) : RigidBody3(), Box(vec3(x, y, z), width, height, depth)
 {
 	UpdateMass();
 	UpdateInertiaTensor();
@@ -34,16 +28,16 @@ void RigidBox::Render(void) const
 
 void RigidBox::UpdateMass(void)
 {
-	inverseMass = 1.0 / (dim.x * dim.y * dim.z);
+	inverseMass = 1.0 / (dim.x * dim.y * dim.z * 8.0f);
 }
 
 void RigidBox::UpdateInertiaTensor(void)
 {
 	real factor = 1.0f / (12.0f * inverseMass);
 
-	real ww = dim.x * dim.x;
-	real hh = dim.y * dim.y;
-	real dd = dim.z * dim.z;
+	real ww = dim.x * dim.x * 4.0f;
+	real hh = dim.y * dim.y * 4.0f;
+	real dd = dim.z * dim.z * 4.0f;
 
 	real m11 = factor * (hh + dd);
 	real m22 = factor * (dd + ww);
@@ -57,14 +51,6 @@ void RigidBox::UpdateInertiaTensor(void)
 void RigidBox::SetDimensions(real width, real height, real depth)
 {
 	Box::SetDimensions(width, height, depth);
-
-	UpdateMass();
-	UpdateInertiaTensor();
-}
-
-void RigidBox::SetDimensions(const vec3& dimensions)
-{
-	Box::SetDimensions(dimensions);
 
 	UpdateMass();
 	UpdateInertiaTensor();

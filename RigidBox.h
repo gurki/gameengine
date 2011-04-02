@@ -17,7 +17,6 @@ class RigidBox : public RigidBody3, public Box
 		// construcotrs
 		RigidBox(void);
 		RigidBox(real x, real y, real z, real width, real height, real depth);
-		RigidBox(const vec3& position, const vec3& dimensions);
 	
 		// methods
 		void Render(void) const;	
@@ -27,5 +26,4 @@ class RigidBox : public RigidBody3, public Box
 
 		// setter
 		void SetDimensions(real width, real height, real depth);
-		void SetDimensions(const vec3& dimensions);
 };

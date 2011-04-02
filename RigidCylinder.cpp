@@ -34,7 +34,7 @@ void RigidCylinder::Render(void) const
 
 void RigidCylinder::UpdateMass(void)
 {
-	inverseMass = 1.0 / (C_PI * radius * radius * height);
+	inverseMass = 1.0 / (C_2PI * radius * radius * height); // 1 / (pi r^2 h)
 }
 
 void RigidCylinder::UpdateInertiaTensor(void)
@@ -42,7 +42,7 @@ void RigidCylinder::UpdateInertiaTensor(void)
 	real factor = 1.0f / (12.0f * inverseMass);
 
 	real rr = radius * radius;
-	real hh = height * height;
+	real hh = height * height * 4.0f;
 
 	real m11 = factor * (3.0f * rr + hh);
 	real m22 = 0.5f * rr / inverseMass;

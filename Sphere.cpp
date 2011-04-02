@@ -122,3 +122,13 @@ real Sphere::GetRadius(void) const
 	return radius;
 }
 
+
+vec3 Sphere::GetPointOnSurface(real u, real v, real w) const
+{
+	vec3 r(u, v, w);
+	
+	r.Normalise() * radius;
+	
+	return r;
+}
+

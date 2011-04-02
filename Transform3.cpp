@@ -48,7 +48,7 @@ vec3 operator * (const vec3& v, const Transform3& t)
 }
 	
 // methods
-vec3 Transform3::FromWorldToLocal(const vec3& v) const
+vec3 Transform3::TransformFromWorldToLocal(const vec3& v) const
 {
 	vec3 r;
 
@@ -76,7 +76,7 @@ vec3 Transform3::FromWorldToLocal(const vec3& v) const
 	return r;
 }
 
-vec3 Transform3::FromLocalToWorld(const vec3& v) const
+vec3 Transform3::TransformFromLocalToWorld(const vec3& v) const
 {
 	vec3 r;
 	
@@ -85,6 +85,37 @@ vec3 Transform3::FromLocalToWorld(const vec3& v) const
 	r.z = v.x * m31 + v.y * m32 + v.z * m33 + m34;
 	
 	return r;
+}
+
+
+vec3 Transform3::RotateFromLocalToWorld(const vec3& v) const
+{
+	vec3 r;
+	
+	r.x = v.x * m11 + v.y * m12 + v.z * m13;
+	r.y = v.x * m21 + v.y * m22 + v.z * m23;
+	r.z = v.x * m31 + v.y * m32 + v.z * m33;
+	
+	return r;
+}
+
+mat3 Transform3::RotateFromLocalToWorld(const mat3& v) const
+{
+	mat3 r;
+
+	r.m11 = m11;
+	r.m12 = m12;
+	r.m13 = m13;
+
+	r.m21 = m21;
+	r.m22 = m22;
+	r.m23 = m23;
+
+	r.m31 = m31;
+	r.m32 = m32;
+	r.m33 = m33;
+	
+	return r * v * r.Transposed();
 }
 
 // setter

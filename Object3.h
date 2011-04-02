@@ -35,6 +35,8 @@ class Object3
 		// getter
 		vec3 GetPosition(void) const;
 		quat GetOrientation(void) const;
+		
+		virtual vec3 GetPointOnSurface(real u, real v, real w) const;
 
 	protected:
 

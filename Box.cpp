@@ -12,22 +12,13 @@ Box::Box(void) : Object3()
 	SetDimensions(1, 1, 1);
 }
 
-Box::Box(const vec3& position, const vec3& dimensions) : Object3(position)
+Box::Box(const vec3& position, real width, real height, real depth) : Object3(position)
 {
-	SetDimensions(dimensions);
+	SetDimensions(width, height, depth);
 }
 
 void Box::Render(void) const
 {
-	real x0 = - dim.x / 2.0;
-	real x1 = - x0;
-
-	real y0 = - dim.y / 2.0;
-	real y1 = - y0;
-
-	real z0 = - dim.z / 2.0;
-	real z1 = - z0;
-
 	glPushMatrix();
 	glMultMatrixf(world.v);
 
@@ -35,31 +26,31 @@ void Box::Render(void) const
 		
 	// front
 		glNormal3f(0.0, 0.0,-1.0);
-		glVertex3f(x0, y1, z0); // upper left
-		glVertex3f(x0, y0, z0); // lower left
-		glVertex3f(x1, y1, z0); // upper right
-		glVertex3f(x1, y0, z0); // lower right
+		glVertex3f(-dim.x, dim.y,-dim.z); // upper left
+		glVertex3f(-dim.x,-dim.y,-dim.z); // lower left
+		glVertex3f( dim.x, dim.y,-dim.z); // upper right
+		glVertex3f( dim.x,-dim.y,-dim.z); // lower right
 		
 	// right
 		glNormal3f(1.0, 0.0, 0.0);
-		glVertex3f(x1, y1, z0); // upper left
-		glVertex3f(x1, y0, z0); // lower left
-		glVertex3f(x1, y1, z1); // upper right
-		glVertex3f(x1, y0, z1); // lower right
+		glVertex3f( dim.x, dim.y,-dim.z); // upper left
+		glVertex3f( dim.x,-dim.y,-dim.z); // lower left
+		glVertex3f( dim.x, dim.y, dim.z); // upper right
+		glVertex3f( dim.x,-dim.y, dim.z); // lower right
 
 	// back
 		glNormal3f(0.0, 0.0, 1.0);
-		glVertex3f(x1, y1, z1); // upper left
-		glVertex3f(x1, y0, z1); // lower left
-		glVertex3f(x0, y1, z1); // upper right
-		glVertex3f(x0, y0, z1); // lower right
+		glVertex3f( dim.x, dim.y, dim.z); // upper left
+		glVertex3f( dim.x,-dim.y, dim.z); // lower left
+		glVertex3f(-dim.x, dim.y, dim.z); // upper right
+		glVertex3f(-dim.x,-dim.y, dim.z); // lower right
 
 	// left
 		glNormal3f(-1.0, 0.0, 0.0);
-		glVertex3f(x0, y1, z1); // upper left
-		glVertex3f(x0, y0, z1); // lower left
-		glVertex3f(x0, y1, z0); // upper right
-		glVertex3f(x0, y0, z0); // lower right
+		glVertex3f(-dim.x, dim.y, dim.z); // upper left
+		glVertex3f(-dim.x,-dim.y, dim.z); // lower left
+		glVertex3f(-dim.x, dim.y,-dim.z); // upper right
+		glVertex3f(-dim.x,-dim.y,-dim.z); // lower right
 
 	glEnd();
 
@@ -67,10 +58,10 @@ void Box::Render(void) const
 	glBegin(GL_TRIANGLE_STRIP);
 
 		glNormal3f(0.0, 1.0, 0.0);
-		glVertex3f(x0, y1, z0);
-		glVertex3f(x1, y1, z0);
-		glVertex3f(x0, y1, z1);
-		glVertex3f(x1, y1, z1);
+		glVertex3f(-dim.x, dim.y,-dim.z);
+		glVertex3f( dim.x, dim.y,-dim.z);
+		glVertex3f(-dim.x, dim.y, dim.z);
+		glVertex3f( dim.x, dim.y, dim.z);
 
 	glEnd();
 
@@ -78,10 +69,10 @@ void Box::Render(void) const
 	glBegin(GL_TRIANGLE_STRIP);
 
 		glNormal3f(0.0,-1.0, 0.0);
-		glVertex3f(x1, y0, z1);
-		glVertex3f(x0, y0, z1);
-		glVertex3f(x1, y0, z0);
-		glVertex3f(x0, y0, z0);
+		glVertex3f( dim.x,-dim.y, dim.z);
+		glVertex3f(-dim.x,-dim.y, dim.z);
+		glVertex3f( dim.x,-dim.y,-dim.z);
+		glVertex3f(-dim.x,-dim.y,-dim.z);
 
 	glEnd();
 
@@ -91,20 +82,28 @@ void Box::Render(void) const
 // setter
 void Box::SetDimensions(real width, real height, real depth)
 {
+	width  *= 0.5f;
+	height *= 0.5f;
+	depth  *= 0.5f;
+	
 	dim.x = inf(width, 0);
 	dim.y = inf(height, 0);
 	dim.z = inf(depth, 0);
-}
-
-void Box::SetDimensions(const vec3& dimensions)
-{
-	dim.x = inf(dimensions.x, 0);
-	dim.y = inf(dimensions.y, 0);
-	dim.z = inf(dimensions.z, 0);
 }
 		
 // getter
 vec3 Box::GetDimensions(void) const
 {
-	return dim;
+	return dim * 2.0f;
+}
+
+vec3 Box::GetPointOnSurface(real u, real v, real w) const
+{
+	vec3 r;
+	
+	r.x = u * dim.x;
+	r.y = v * dim.y;
+	r.z = w * dim.z;
+	
+	return r;
 }
