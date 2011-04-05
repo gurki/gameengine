@@ -87,6 +87,9 @@ class Color
 		friend ostream& operator << (ostream& out, const Color& c);
 		friend istream& operator >> (istream& in, Color& c);
 
+		// variables
+		float v[4];
+
 	private:
 
 		void CMYKtoRGB(void);
@@ -96,6 +99,5 @@ class Color
 		void RGBtoCMY(void);
 		void RGBtoCMYK(void);
 
-		float RGBA[4];
 		static float conv[5];
 };

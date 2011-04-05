@@ -8,21 +8,15 @@
 #include "GameEngine.h"
 
 #include "Grid3.h"
-#include "RigidBody3.h"
-#include "RigidBox.h"
-#include "RigidCylinder.h"
-#include "RigidSphere.h"
+#include "PhysicsEngine.h"
 
 Camera cam;
 Grid3 grid;
 
-#define k 3
+RigidSphere sphere1, sphere2, sphere3;
 
-RigidBox box;
-RigidBox stick;
-RigidCylinder rod;
-
-RigidBody3* bodies[k];
+ParticleSpring spring1, spring2;
+Gravity gravity;
 
 int main(int argc, char* argv[])
 {
@@ -35,102 +29,84 @@ int main(int argc, char* argv[])
 
 	grid.SetDimensions(10, 10);
 
-	rod.SetRadius(0.5f);
-	rod.SetHeight(2.0f);
-	rod.SetPosition(3.0f, 0.0f, 0.0f);
-
-	box.SetDimensions(1.0f, 1.0f, 1.0f);
-	box.SetPosition(0.0f, 0.0f, 0.0f);
-
-	stick.SetDimensions(0.5f, 2.0f, 0.5f);
-	stick.SetPosition(-3.0f, 0.0f, 0.0f);
+	sphere1.SetPosition(-2, 0, 0);
+	sphere2.SetPosition(2, 0, 0);
+	sphere3.SetPosition(0, 0, 2);
 	
-	bodies[0] = &rod;
-	bodies[1] = &box;
-	bodies[2] = &stick;
+	spring1 = ParticleSpring(2.0f, 10.0f, 1.0f, &sphere1, &sphere2);
+	spring2 = ParticleSpring(2.0f, 10.0f, 1.0f, &sphere2, &sphere3);
+
+	gravity = Gravity();
+
+	PhysicsEngine.AddRigidBody(&sphere1);
+	PhysicsEngine.AddRigidBody(&sphere2);
+	PhysicsEngine.AddRigidBody(&sphere3);
+
+	PhysicsEngine.AddForceGenerator(&spring1);
+	PhysicsEngine.AddForceGenerator(&spring2);
+
+	// PhysicsEngine.AddGlobalForceGenerator(&gravity);
 	
+	// glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
 	// start game
 	GameEngine.Start();
+
 	return 0;
 }
 
 void CGameEngine::Render(void) const
 {
-	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-	glLoadIdentity();
-	
 	cam.SetActive();
 
 	Color::WithWhite().Bind();
 	grid.Render();
-
-	Color::WithGreen().Desaturate(0.5f).Bind();
-	bodies[0]->Render();
 	
-	Color::WithOrange().Desaturate(0.5f).Bind();
-	bodies[1]->Render();
-	
-	Color::WithYellow().Desaturate(0.5f).Bind();
-	bodies[2]->Render();
-	
-	glutSwapBuffers();
-
-	glEnable(GL_LIGHTING);
+	PhysicsEngine.RenderRigidBodies();
 }
 
 void CGameEngine::Idle(void) const
 {
-	real n = 10;
-	
-	// apply forces
-	vec3 points[k];
-	for(uint i = 0; i < k; i++) points[i] = bodies[i]->GetPointOnSurface(0, 1, 0);
-	
-	if(Keyboard.KeyIsPressed('a')) for(uint i = 0; i < k; i++) bodies[i]->ApplyTorque( vec3::X() * n);
-	if(Keyboard.KeyIsPressed('A')) for(uint i = 0; i < k; i++) bodies[i]->ApplyTorque(-vec3::X() * n);
-	
-	if(Keyboard.KeyIsPressed('s')) for(uint i = 0; i < k; i++) bodies[i]->ApplyTorque( vec3::Y() * n);
-	if(Keyboard.KeyIsPressed('S')) for(uint i = 0; i < k; i++) bodies[i]->ApplyTorque(-vec3::Y() * n);
 
-	if(Keyboard.KeyIsPressed('d')) for(uint i = 0; i < k; i++) bodies[i]->ApplyTorque( vec3::Z() * n);
-	if(Keyboard.KeyIsPressed('D')) for(uint i = 0; i < k; i++) bodies[i]->ApplyTorque(-vec3::Z() * n);		
-	
-	if(Keyboard.KeyIsPressed('q')) for(uint i = 0; i < k; i++) bodies[i]->ApplyForceAtBodyPoint( vec3::X() * n, points[i]);
-	if(Keyboard.KeyIsPressed('Q')) for(uint i = 0; i < k; i++) bodies[i]->ApplyForceAtBodyPoint(-vec3::X() * n, points[i]);
-	
-	if(Keyboard.KeyIsPressed('w')) for(uint i = 0; i < k; i++) bodies[i]->ApplyForceAtBodyPoint( vec3::Y() * n, points[i]);
-	if(Keyboard.KeyIsPressed('W')) for(uint i = 0; i < k; i++) bodies[i]->ApplyForceAtBodyPoint(-vec3::Y() * n, points[i]);
-
-	if(Keyboard.KeyIsPressed('e')) for(uint i = 0; i < k; i++) bodies[i]->ApplyForceAtBodyPoint( vec3::Z() * n, points[i]);
-	if(Keyboard.KeyIsPressed('E')) for(uint i = 0; i < k; i++) bodies[i]->ApplyForceAtBodyPoint(-vec3::Z() * n, points[i]);		
-
-	// physics
-	static const real timestep = 0.01f;
-	static real dt = 0;
-	
-	dt += Time.GetTimeDelta();
-
-	while(dt >= 0)
-	{
-		for(uint i = 0; i < k; i++) bodies[i]->Update(timestep);
-
-		dt -= timestep;
-	}
-
-	for(uint i = 0; i < k; i++) bodies[i]->ClearAccumulators();
 }
 
 void CGameEngine::Input(void) const
 {
-	// pause game
-	if(Keyboard.KeyWasPressed('u')) GameEngine.Unpause();
-	if(Keyboard.KeyWasPressed('p')) GameEngine.Pause();
+	// physics
+	const uint k = PhysicsEngine.GetNumberOfRigidBodies();
 
+	real n = 10;
+	vec3 point = vec3(0, 1, 0);
+	
+	// apply forces
+	if(Keyboard.KeyIsPressed('a')) for(uint i = 0; i < k; i++) PhysicsEngine.GetRigidBody(i)->ApplyTorque( vec3::X() * n);
+	if(Keyboard.KeyIsPressed('A')) for(uint i = 0; i < k; i++) PhysicsEngine.GetRigidBody(i)->ApplyTorque(-vec3::X() * n);
+	
+	if(Keyboard.KeyIsPressed('s')) for(uint i = 0; i < k; i++) PhysicsEngine.GetRigidBody(i)->ApplyTorque( vec3::Y() * n);
+	if(Keyboard.KeyIsPressed('S')) for(uint i = 0; i < k; i++) PhysicsEngine.GetRigidBody(i)->ApplyTorque(-vec3::Y() * n);
+
+	if(Keyboard.KeyIsPressed('d')) for(uint i = 0; i < k; i++) PhysicsEngine.GetRigidBody(i)->ApplyTorque( vec3::Z() * n);
+	if(Keyboard.KeyIsPressed('D')) for(uint i = 0; i < k; i++) PhysicsEngine.GetRigidBody(i)->ApplyTorque(-vec3::Z() * n);		
+	
+	if(Keyboard.KeyIsPressed('q')) for(uint i = 0; i < k; i++) PhysicsEngine.GetRigidBody(i)->ApplyForceAtBodyPoint( vec3::X() * n, point);
+	if(Keyboard.KeyIsPressed('Q')) for(uint i = 0; i < k; i++) PhysicsEngine.GetRigidBody(i)->ApplyForceAtBodyPoint(-vec3::X() * n, point);
+	
+	if(Keyboard.KeyIsPressed('w')) for(uint i = 0; i < k; i++) PhysicsEngine.GetRigidBody(i)->ApplyForceAtBodyPoint( vec3::Y() * n, point);
+	if(Keyboard.KeyIsPressed('W')) for(uint i = 0; i < k; i++) PhysicsEngine.GetRigidBody(i)->ApplyForceAtBodyPoint(-vec3::Y() * n, point);
+
+	if(Keyboard.KeyIsPressed('e')) for(uint i = 0; i < k; i++) PhysicsEngine.GetRigidBody(i)->ApplyForceAtBodyPoint( vec3::Z() * n, point);
+	if(Keyboard.KeyIsPressed('E')) for(uint i = 0; i < k; i++) PhysicsEngine.GetRigidBody(i)->ApplyForceAtBodyPoint(-vec3::Z() * n, point);		
+
+	// reset
 	if(Keyboard.KeyWasPressed('r')) 
 	{
-		for(uint i = 0; i < k; i++) bodies[i]->SetOrientation(0, 0, 0);
-		for(uint i = 0; i < k; i++) bodies[i]->SetAngularVelocity(vec3::Zero());
+		for(uint i = 0; i < k; i++) PhysicsEngine.GetRigidBody(i)->SetPosition(0, 0, 0);
+		for(uint i = 0; i < k; i++) PhysicsEngine.GetRigidBody(i)->SetOrientation(0, 0, 0);
+		for(uint i = 0; i < k; i++) PhysicsEngine.GetRigidBody(i)->SetAngularVelocity(vec3::Zero());
 	}
 	
-	if(Keyboard.KeyWasPressed('f')) for(uint i = 0; i < k; i++) bodies[i]->SetAngularVelocity(vec3::Zero());
+	if(Keyboard.KeyWasPressed('f')) for(uint i = 0; i < k; i++) PhysicsEngine.GetRigidBody(i)->SetAngularVelocity(vec3::Zero());
+
+	// game
+	if(Keyboard.KeyWasPressed('p')) GameEngine.TogglePause();
 }

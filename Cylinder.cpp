@@ -9,6 +9,10 @@
 #include "Color.h"
 #include "Vector2.h"
 
+#include <fstream>
+
+using namespace std;
+
 Cylinder::Cylinder(void) : Object3()
 {
 	SetHeight(5.0f);
@@ -25,6 +29,8 @@ void Cylinder::Render(void) const
 {
 	static const real n = 20;
 	real ratio, n1, n2;
+
+	material.Bind();
 
 	glPushMatrix();
 	glMultMatrixf(world.v);
@@ -109,18 +115,7 @@ real Cylinder::GetRadius(void) const
 	return radius;
 }
 
-// getter
-vec3 Cylinder::GetPointOnSurface(real u, real v, real w) const
+real Cylinder::GetBoundingSphereRadius(void) const
 {
-	vec2 n(u, w);
-	
-	n.Normalise();
-	
-	vec3 r;
-	
-	r.x = n.x * radius;
-	r.y = v * height;
-	r.z = n.y * radius;
-	
-	return r;
+	return sqrt(radius * radius + height * height);
 }

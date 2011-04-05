@@ -7,31 +7,26 @@
 
 #pragma once
 
-#include "Object3.h"
+#ifndef _MATERIAL_H
+#define _MATERIAL_H
 
-class Sphere : public virtual Object3
+#include "Color.h"
+#include "Types.h"
+#include "OpenGL.h"
+
+class Material
 {
 	public:
 
-		// constructors
-		Sphere(void);
-		Sphere(const vec3& position, real radius);
+		Material(void);
+		Material(real R, real G, real B);
+		Material(const Color& color);
 
-		// methods
-		void Render(void) const;
-				
-		// setter
-		virtual void SetRadius(real radius);
-		
-		// getter
-		real GetRadius(void) const;
-		real GetBoundingSphereRadius(void) const;
-
-		vec3 GetPointOnSurface(real u, real v, real w) const;
-		vec3 GetPointOnSurface(real theta, real phi) const;
+		void Bind(void) const;
 
 	protected:
 
-		// variables
-		real radius;
+		Color color;
 };
+
+#endif

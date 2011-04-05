@@ -54,20 +54,16 @@ void RigidBody3::ClearAccumulators(void)
 
 void RigidBody3::Update(real dt)
 {
-	// damping
-	real linearDamping = 0.97f;
-	real angularDamping = 0.97f;
-
 	// linear movement
 	vec3 temp = forces * inverseMass * dt;
 
-	linearVelocity = temp + linearVelocity * linearDamping;
+	linearVelocity = temp + linearVelocity;
 	pos = 0.5f * temp * dt + linearVelocity * dt + pos;
 	
 	// angular movement
 	temp = torques * world.RotateFromLocalToWorld(inverseInertiaTensor) * dt;
 
-	angularVelocity = temp + angularVelocity * angularDamping;
+	angularVelocity = temp + angularVelocity;
 	ori =  0.5 * quat(0, 0.5f * temp + angularVelocity) * ori * dt + ori;
 
 	ori.Normalise();
@@ -97,5 +93,35 @@ void RigidBody3::SetAngularVelocity(const vec3& velocity)
 
 void RigidBody3::SetMass(real mass)
 {
-	inverseMass = 1.0f / mass;
+	if(mass == C_INF)
+	{
+		inverseMass = 0.0f;
+	} 
+	else 
+	{
+		inverseMass = 1.0f / mass;
+	}
+
+	UpdateInertiaTensor();
+}
+
+// getter
+vec3 RigidBody3::GetLinearVelocity(void) const
+{
+	return linearVelocity;
+}
+
+vec3 RigidBody3::GetAngularVelocity(void) const
+{
+	return angularVelocity;
+}
+
+real RigidBody3::GetInverseMass(void) const
+{
+	return inverseMass;
+}
+
+mat3 RigidBody3::GetInverseInertiaTensor(void) const
+{
+	return inverseInertiaTensor;
 }

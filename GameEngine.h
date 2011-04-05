@@ -13,6 +13,7 @@
 #include "Window.h"
 #include "Timer.h"
 #include "Camera.h"
+#include "PhysicsEngine.h"
 
 #include "Types.h"
 
@@ -38,8 +39,7 @@ class CGameEngine
 		
 		void Start(void);
 		void End(void);
-		void Unpause(void);
-		void Pause(void);
+		void TogglePause(void);
 
 		// GAMEENGINE GETTERS
 

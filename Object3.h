@@ -12,6 +12,7 @@
 #include "OpenGL.h"
 #include "Quaternion.h"
 #include "Transform3.h"
+#include "Material.h"
 
 class Object3
 {
@@ -32,11 +33,16 @@ class Object3
 		virtual void SetOrientation(const quat& orientation);
 		virtual void SetOrientation(real yaw, real pitch, real roll);
 
+		void SetElasticity(real elasticity);
+		void SetMaterial(const Material& material);
+
 		// getter
 		vec3 GetPosition(void) const;
 		quat GetOrientation(void) const;
 		
-		virtual vec3 GetPointOnSurface(real u, real v, real w) const;
+		virtual real GetBoundingSphereRadius(void) const;
+		
+		real GetElasticity(void) const;
 
 	protected:
 
@@ -47,4 +53,7 @@ class Object3
 		quat ori;
 
 		trans3 world;
+
+		real elasticity;
+		Material material;
 };

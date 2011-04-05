@@ -7,7 +7,12 @@
 
 #pragma once
 
-#include <math.h>
+#ifndef _MATHLIB_H 
+#define _MATHLIB_H
+
+#include <cmath>
+#include <climits>
+
 #include "Types.h"
 
 // angles
@@ -64,17 +69,31 @@
 inline bool isPrime(int n);
 
 // limits
-#define C_MAXF             3.402823466e38          // largest representable float value
-#define C_MAXD             1.7976931348623157e308  // largest representable double value
+#define C_FLOAT_MIN   1.401298464e-45         // smallest representable float value
+#define C_FLOAT_MAX   3.402823466e38          // largest representable float value
+#define C_FLOAT_EPS   1.1929093e-7            // epsilon
+#define C_FLOAT_INF   (std::numeric_limits<float>::infinity())
+#define C_FLOAT_NAN   (std::numeric_limits<float>::quiet_NaN())
 
-#define C_MINPRECISEF      1.175494351e-38         // smallest representable float value without loosing precission
-#define C_MINPRECISED      2.2250738585072014e-308 // smallest representable double value without loosing precission
+#define C_DOUBLE_MIN  5e-324                  // smallest representable double value
+#define C_DOUBLE_MAX  1.7976931348623157e308  // largest representable double value
+#define C_DOUBLE_EPS  2.220446049250313e-16   // epsilon
+#define C_DOUBLE_INF  (std::numeric_limits<double>::infinity())
+#define C_DOUBLE_NAN  (std::numeric_limits<double>::quiet_NaN())
 
-#define C_MINF             1.401298464e-45         // smallest representable float value
-#define C_MIND             5e-324                  // smallest representable double value
-
-#define C_EPSILONF         1.1929093e-7            // smallest possible float value different from 1.0
-#define C_EPSILOND         2.220446049250313e-16   // smallest possible double value different from 1.0
+#ifdef DOUBLE_PRECISSION
+	#define C_MIN C_DOUBLE_MIN
+	#define C_MAX C_DOUBLE_MAX
+	#define C_EPS C_DOUBLE_EPS
+	#define C_INF C_DOUBLE_INF
+	#define C_NAN C_DOUBLE_NAN
+#else
+	#define C_MIN C_FLOAT_MIN
+	#define C_MAX C_FLOAT_MAX
+	#define C_EPS C_FLOAT_EPS
+	#define C_INF C_FLOAT_INF
+	#define C_NAN C_FLOAT_NAN
+#endif
 
 // constants
 #define C_1DIV3      (real)0.333333333333333333333 // 1/3
@@ -150,3 +169,5 @@ inline bool isPrime(int n);
 
 	problem with all: function call takes too long!!
 */
+
+#endif

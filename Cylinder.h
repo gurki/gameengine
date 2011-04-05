@@ -27,7 +27,8 @@ class Cylinder : public virtual Object3
 		// getter
 		real GetHeight(void) const;
 		real GetRadius(void) const;
-		vec3 GetPointOnSurface(real u, real v, real w) const;
+		
+		real GetBoundingSphereRadius(void) const;
 
 	protected:
 

@@ -7,31 +7,38 @@
 
 #pragma once
 
-#include "Object3.h"
+#ifndef _SPRING_H
+#define _SPRING_H
 
-class Sphere : public virtual Object3
+#include "ForceGenerator.h"
+#include "MathLib.h"
+
+class Spring : public ForceGenerator
 {
 	public:
 
 		// constructors
-		Sphere(void);
-		Sphere(const vec3& position, real radius);
+		Spring(void);
+		Spring(real l, real k, real b);
 
-		// methods
-		void Render(void) const;
-				
 		// setter
-		virtual void SetRadius(real radius);
-		
-		// getter
-		real GetRadius(void) const;
-		real GetBoundingSphereRadius(void) const;
+		void SetDamping(real b);
+		void SetStiffness(real k);
+		void SetRestLength(real l);
 
-		vec3 GetPointOnSurface(real u, real v, real w) const;
-		vec3 GetPointOnSurface(real theta, real phi) const;
+		// getter
+		real GetDamping(void) const;
+		real GetStiffness(void) const;
+		real GetRestLength(void) const;
+
+		virtual real GetCurrentLength(void) const = 0;
 
 	protected:
 
 		// variables
-		real radius;
+		real k;
+		real b;
+		real l;
 };
+
+#endif

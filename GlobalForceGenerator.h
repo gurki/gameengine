@@ -7,31 +7,19 @@
 
 #pragma once
 
-#include "Object3.h"
+#ifndef _GLOBALFORCEGENERATOR_H
+#define _GLOBALFORCEGENERATOR_H
 
-class Sphere : public virtual Object3
+#include "Types.h"
+#include "Vector3.h"
+#include "RigidBody3.h"
+
+class GlobalForceGenerator
 {
-	public:
-
-		// constructors
-		Sphere(void);
-		Sphere(const vec3& position, real radius);
+	public:	
 
 		// methods
-		void Render(void) const;
-				
-		// setter
-		virtual void SetRadius(real radius);
-		
-		// getter
-		real GetRadius(void) const;
-		real GetBoundingSphereRadius(void) const;
-
-		vec3 GetPointOnSurface(real u, real v, real w) const;
-		vec3 GetPointOnSurface(real theta, real phi) const;
-
-	protected:
-
-		// variables
-		real radius;
+		virtual void ApplyForce(RigidBody3* rigidBody) {};
 };
+
+#endif

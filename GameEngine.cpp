@@ -55,14 +55,16 @@ void CGameEngine::End(void)
 	exit(EXIT_SUCCESS);
 }
 
-void CGameEngine::Pause(void)
+void CGameEngine::TogglePause(void)
 {
-	m_paused = true;
-}
-
-void CGameEngine::Unpause(void)
-{
-	m_paused = false;
+	if(m_paused == true)
+	{
+		m_paused = false;
+	}
+	else
+	{
+		m_paused = true;
+	}
 }
 
 bool CGameEngine::IsPaused(void)
@@ -84,8 +86,14 @@ void CGameEngine::IdleFunction(void)
 
 	if(GameEngine.IsPaused() == false)
 	{
+		glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+		glLoadIdentity();
+
+		PhysicsEngine.Update();
 		GameEngine.Idle();
 		GameEngine.Render();
+
+		glutSwapBuffers();
 	}
 
 	GameEngine.ClearInput();

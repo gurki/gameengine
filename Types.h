@@ -19,7 +19,11 @@
 #endif
 
 // typedefs
-typedef float real;
+#ifdef DOUBLE_PRECISSION
+	typedef double real;
+#else
+	typedef float real;
+#endif
 
 typedef unsigned int uint;
 typedef unsigned char uchar;

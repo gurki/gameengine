@@ -7,31 +7,30 @@
 
 #pragma once
 
-#include "Object3.h"
+#ifndef _PARTICLESPRING_H
+#define _PARTICLESPRING_H
 
-class Sphere : public virtual Object3
+#include "Spring.h"
+#include "RigidBody3.h"
+
+class ParticleSpring : public Spring
 {
 	public:
-
+		
 		// constructors
-		Sphere(void);
-		Sphere(const vec3& position, real radius);
+		ParticleSpring(void);
+		ParticleSpring(real l, real k, real b, RigidBody3* anchor1, RigidBody3* anchor2);
 
 		// methods
-		void Render(void) const;
-				
-		// setter
-		virtual void SetRadius(real radius);
-		
-		// getter
-		real GetRadius(void) const;
-		real GetBoundingSphereRadius(void) const;
+		void ApplyForce(void);
 
-		vec3 GetPointOnSurface(real u, real v, real w) const;
-		vec3 GetPointOnSurface(real theta, real phi) const;
+		// getter
+		real GetCurrentLength(void) const;
 
 	protected:
 
 		// variables
-		real radius;
+		RigidBody3* anchors[2];
 };
+
+#endif

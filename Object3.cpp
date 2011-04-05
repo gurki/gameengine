@@ -12,23 +12,28 @@ Object3::Object3(void)
 {
 	SetPosition( vec3::Zero() );
 	SetOrientation( quat::Identity() );
+	SetElasticity(0.8f);
 }
 
 Object3::Object3(const vec3& position)
 {
 	SetPosition(position);
 	SetOrientation( quat::Identity() );
+	SetElasticity(0.8f);
 }
 
 Object3::Object3(real x, real y, real z)
 {
 	SetPosition(x, y, z);
 	SetOrientation( quat::Identity() );
+	SetElasticity(0.8f);
 }
 
 // methods
 void Object3::Render(void) const
 {
+	material.Bind();
+
 	glBegin(GL_POINTS);
 
 		glVertex3fv(pos.v); 
@@ -67,6 +72,16 @@ void Object3::SetOrientation(real yaw, real pitch, real roll)
 	world.SetRotation(ori);
 }
 
+void Object3::SetElasticity(real elasticity)
+{
+	this->elasticity = elasticity;
+}
+
+void Object3::SetMaterial(const Material& material)
+{
+	this->material = material;
+}
+
 // getter
 vec3 Object3::GetPosition(void) const
 {
@@ -78,7 +93,12 @@ quat Object3::GetOrientation(void) const
 	return ori;
 }
 
-vec3 Object3::GetPointOnSurface(real u, real v, real w) const
+real Object3::GetBoundingSphereRadius(void) const
 {
-	return vec3::Zero();	
+	return 0.0f;
+}
+
+real Object3::GetElasticity(void) const
+{
+	return elasticity;
 }

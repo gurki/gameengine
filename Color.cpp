@@ -16,10 +16,10 @@ float Color::conv[5] = {1, 1, 1, 1, 1};
 
 Color::Color(void)
 {
-	RGBA[0] = 1.0f;
-	RGBA[1] = 1.0f;
-	RGBA[2] = 1.0f;
-	RGBA[3] = 1.0f;
+	v[0] = 1.0f;
+	v[1] = 1.0f;
+	v[2] = 1.0f;
+	v[3] = 1.0f;
 }
 
 Color::Color(float R, float G, float B, float A)
@@ -31,7 +31,7 @@ Color& Color::ShiftCW(float v)
 {
 	float* HLS = GetHLS();
 
-	*this = WithHLS(HLS[0] - v, HLS[1], HLS[2], RGBA[3]);
+	*this = WithHLS(HLS[0] - v, HLS[1], HLS[2], this->v[3]);
 
 	return *this;
 }
@@ -40,7 +40,7 @@ Color& Color::ShiftCCW(float v)
 {
 	float* HLS = GetHLS();
 
-	*this = WithHLS(HLS[0] + v, HLS[1], HLS[2], RGBA[3]);
+	*this = WithHLS(HLS[0] + v, HLS[1], HLS[2], this->v[3]);
 
 	return *this;
 }
@@ -49,7 +49,7 @@ Color& Color::Darken(float v)
 {
 	float* HLS = GetHLS();
 
-	*this = WithHLS(HLS[0], HLS[1] - v, HLS[2], RGBA[3]);
+	*this = WithHLS(HLS[0], HLS[1] - v, HLS[2], this->v[3]);
 
 	return *this;
 }
@@ -58,7 +58,7 @@ Color& Color::Lighten(float v)
 {
 	float* HLS = GetHLS();
 
-	*this = WithHLS(HLS[0], HLS[1] + v, HLS[2], RGBA[3]);
+	*this = WithHLS(HLS[0], HLS[1] + v, HLS[2], this->v[3]);
 
 	return *this;
 }
@@ -67,7 +67,7 @@ Color& Color::Saturate(float v)
 {
 	float* HLS = GetHLS();
 
-	*this = WithHLS(HLS[0], HLS[1], HLS[2] + v, RGBA[3]);
+	*this = WithHLS(HLS[0], HLS[1], HLS[2] + v, this->v[3]);
 
 	return *this;
 }
@@ -76,14 +76,14 @@ Color& Color::Desaturate(float v)
 {
 	float* HLS = GetHLS();
 
-	*this = WithHLS(HLS[0], HLS[1], HLS[2] - v, RGBA[3]);
+	*this = WithHLS(HLS[0], HLS[1], HLS[2] - v, this->v[3]);
 
 	return *this;
 }
 
 Color& Color::SetAlpha(float Alpha)
 {
-	RGBA[3] = limit(Alpha, 0.0f, 1.0f);
+	v[3] = limit(Alpha, 0.0f, 1.0f);
 
 	return *this;
 }
@@ -116,10 +116,10 @@ Color Color::WithHLS(float H, float L, float S, float A)
 
     if(S == 0)
 	{
-        c.RGBA[0] = L;
-		c.RGBA[1] = L;
-		c.RGBA[2] = L; 
-		c.RGBA[3] = A;
+        c.v[0] = L;
+		c.v[1] = L;
+		c.v[2] = L; 
+		c.v[3] = A;
 
 		return c;
     }
@@ -128,10 +128,10 @@ Color Color::WithHLS(float H, float L, float S, float A)
 		float q = (L < 0.5f) ? (L * (1.0f + S)) : ((L + S) - (L * S));
         float p = 2.0f * L - q;
     
-		c.RGBA[0] = HueToRGB(p, q, H + 1.0f/3.0f);
-        c.RGBA[1] = HueToRGB(p, q, H);
-        c.RGBA[2] = HueToRGB(p, q, H - 1.0f/3.0f);
-		c.RGBA[3] = A;
+		c.v[0] = HueToRGB(p, q, H + 1.0f/3.0f);
+        c.v[1] = HueToRGB(p, q, H);
+        c.v[2] = HueToRGB(p, q, H - 1.0f/3.0f);
+		c.v[3] = A;
     }
 
 	return c;
@@ -148,10 +148,10 @@ Color Color::WithHSV(float H, float S, float V, float A)
 
 	if(S == 0.0f)
 	{
-		c.RGBA[0] = V;
-		c.RGBA[1] = V;
-		c.RGBA[2] = V;
-		c.RGBA[3] = A;
+		c.v[0] = V;
+		c.v[1] = V;
+		c.v[2] = V;
+		c.v[3] = A;
 
 		return c;
 	}
@@ -166,12 +166,12 @@ Color Color::WithHSV(float H, float S, float V, float A)
 
 		switch(i)
 		{
-			case 0:  c.RGBA[0] = V; c.RGBA[1] = t; c.RGBA[2] = p; break;
-			case 1:  c.RGBA[0] = q; c.RGBA[1] = V; c.RGBA[2] = p; break;
-			case 2:  c.RGBA[0] = p; c.RGBA[1] = V; c.RGBA[2] = t; break;
-			case 3:  c.RGBA[0] = p; c.RGBA[1] = q; c.RGBA[2] = V; break;
-			case 4:  c.RGBA[0] = t; c.RGBA[1] = p; c.RGBA[2] = V; break;
-			default: c.RGBA[0] = V; c.RGBA[1] = p; c.RGBA[2] = q; break;
+			case 0:  c.v[0] = V; c.v[1] = t; c.v[2] = p; break;
+			case 1:  c.v[0] = q; c.v[1] = V; c.v[2] = p; break;
+			case 2:  c.v[0] = p; c.v[1] = V; c.v[2] = t; break;
+			case 3:  c.v[0] = p; c.v[1] = q; c.v[2] = V; break;
+			case 4:  c.v[0] = t; c.v[1] = p; c.v[2] = V; break;
+			default: c.v[0] = V; c.v[1] = p; c.v[2] = q; break;
 		}
 	}
 
@@ -187,10 +187,10 @@ Color Color::WithRGB(float R, float G, float B, float A)
 
 	Color c;
 
-	c.RGBA[0] = R;
-	c.RGBA[1] = G;
-	c.RGBA[2] = B;
-	c.RGBA[3] = A;
+	c.v[0] = R;
+	c.v[1] = G;
+	c.v[2] = B;
+	c.v[3] = A;
 
 	return c;
 }
@@ -204,10 +204,10 @@ Color Color::WithUnsignedRGB(uint R, uint G, uint B, float A)
 
 	Color c;
 
-	c.RGBA[0] = R / 255.0f;
-	c.RGBA[1] = G / 255.0f;
-	c.RGBA[2] = B / 255.0f;
-	c.RGBA[3] = A / 255.0f;
+	c.v[0] = R / 255.0f;
+	c.v[1] = G / 255.0f;
+	c.v[2] = B / 255.0f;
+	c.v[3] = A / 255.0f;
 
 	return c;
 }
@@ -221,9 +221,9 @@ Color Color::WithCMY(float C, float M, float Y, float A)
 
 	Color c;
 
-	c.RGBA[0] = 1.0f - C;
-	c.RGBA[1] = 1.0f - M;
-	c.RGBA[2] = 1.0f - Y;	
+	c.v[0] = 1.0f - C;
+	c.v[1] = 1.0f - M;
+	c.v[2] = 1.0f - Y;	
 
 	return c;
 }
@@ -238,9 +238,9 @@ Color Color::WithCMYK(float C, float M, float Y, float K, float A)
 
 	Color c;
 
-	c.RGBA[0] = (1.0f - (C * (1.0f - K) + K));
-	c.RGBA[1] = (1.0f - (M * (1.0f - K) + K));
-	c.RGBA[2] = (1.0f - (Y * (1.0f - K) + K));
+	c.v[0] = (1.0f - (C * (1.0f - K) + K));
+	c.v[1] = (1.0f - (M * (1.0f - K) + K));
+	c.v[2] = (1.0f - (Y * (1.0f - K) + K));
 
 	return c;
 }
@@ -248,13 +248,13 @@ Color Color::WithCMYK(float C, float M, float Y, float K, float A)
 // getter
 float Color::GetAlpha(void)
 { 
-	return RGBA[3]; 
+	return v[3]; 
 }
 
 float* Color::GetHLS(void) 
 { 
-	float max = max3(RGBA[0], RGBA[1], RGBA[2]);
-	float min = min3(RGBA[0], RGBA[1], RGBA[2]);
+	float max = max3(v[0], v[1], v[2]);
+	float min = min3(v[0], v[1], v[2]);
 
 	conv[1] = (max + min) / 2.0f;
   
@@ -269,31 +269,31 @@ float* Color::GetHLS(void)
 
         conv[2] = (conv[1] > 0.5f) ? (d / (2.0f - max - min)) : (d / (max + min));
 
-        if(max == RGBA[0]) 
+        if(max == v[0]) 
 		{
-			conv[0] = 0.0f + (RGBA[1] - RGBA[2]) / d;
+			conv[0] = 0.0f + (v[1] - v[2]) / d;
 		}
-		else if(max == RGBA[1]) 
+		else if(max == v[1]) 
 		{
-			conv[0] = 2.0f + (RGBA[2] - RGBA[0]) / d;
+			conv[0] = 2.0f + (v[2] - v[0]) / d;
 		}
-		else if(max == RGBA[2]) 
+		else if(max == v[2]) 
 		{
-			conv[0] = 4.0f + (RGBA[0] - RGBA[1]) / d;
+			conv[0] = 4.0f + (v[0] - v[1]) / d;
 		}
        
 		conv[0] = modf(conv[0] / 6.0f, 1.0f);
     }
 
-	conv[3] = RGBA[3];
+	conv[3] = v[3];
 
 	return conv; 
 }
 
 float* Color::GetHSV(void) 
 { 
-	float max = max3(RGBA[0], RGBA[1], RGBA[2]);
-	float min = min3(RGBA[0], RGBA[1], RGBA[2]);
+	float max = max3(v[0], v[1], v[2]);
+	float min = min3(v[0], v[1], v[2]);
 	float d = max - min;
 
 	conv[2] = max;
@@ -307,47 +307,47 @@ float* Color::GetHSV(void)
 	{	
 		conv[1] = d / max;
 		
-        if(max == RGBA[0]) 
+        if(max == v[0]) 
 		{
-			conv[0] = 0.0f + (RGBA[1] - RGBA[2]) / d;
+			conv[0] = 0.0f + (v[1] - v[2]) / d;
 		}
-		else if(max == RGBA[1]) 
+		else if(max == v[1]) 
 		{
-			conv[0] = 2.0f + (RGBA[2] - RGBA[0]) / d;
+			conv[0] = 2.0f + (v[2] - v[0]) / d;
 		}
-		else if(max == RGBA[2]) 
+		else if(max == v[2]) 
 		{
-			conv[0] = 4.0f + (RGBA[0] - RGBA[1]) / d;
+			conv[0] = 4.0f + (v[0] - v[1]) / d;
 		}
 	
 		conv[0] = modf(conv[0] / 6.0f, 1.0f);
 	}
 
-	conv[3] = RGBA[3];
+	conv[3] = v[3];
 
 	return conv;
 }
 
 float* Color::GetRGB(void) 
 {
-	return RGBA;
+	return v;
 }
 
 float* Color::GetCMY(void) 
 { 
-	conv[0] = 1.0f - RGBA[0];
-	conv[1] = 1.0f - RGBA[1];
-	conv[2] = 1.0f - RGBA[2];
-	conv[3] = RGBA[3];
+	conv[0] = 1.0f - v[0];
+	conv[1] = 1.0f - v[1];
+	conv[2] = 1.0f - v[2];
+	conv[3] = v[3];
 
 	return conv;
 }
 
 float* Color::GetCMYK(void)
 { 
-	conv[0] = 1.0f - RGBA[0];
-	conv[1] = 1.0f - RGBA[1];
-	conv[2] = 1.0f - RGBA[2];
+	conv[0] = 1.0f - v[0];
+	conv[1] = 1.0f - v[1];
+	conv[2] = 1.0f - v[2];
 	conv[3] = 1.0f;
 
 	if(conv[0] < conv[3]) conv[3] = conv[0];
@@ -367,7 +367,7 @@ float* Color::GetCMYK(void)
 	   conv[2] = (conv[2] - conv[3]) / (1.0f - conv[3]);
 	}
 
-	conv[3] = RGBA[3];
+	conv[3] = v[3];
 
 	return conv;
 }
@@ -470,12 +470,16 @@ Color Color::WithRedPurple(void)
 
 void Color::Bind(void) const
 {
-	glColor4f(RGBA[0], RGBA[1], RGBA[2], RGBA[3]);
+	#ifdef DOUBLE_PRECISION
+		glColor4dv(v);
+	#else
+		glColor4fv(v);
+	#endif
 }
 
 ostream& operator << (ostream& out, const Color& c)
 {
-	out << "(" << c.RGBA[0] << ", " << c.RGBA[1] << ", " << c.RGBA[2] << ", " << c.RGBA[3] << ")";
+	out << "(" << c.v[0] << ", " << c.v[1] << ", " << c.v[2] << ", " << c.v[3] << ")";
 			
 	return out;
 }

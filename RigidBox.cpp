@@ -29,6 +29,7 @@ void RigidBox::Render(void) const
 void RigidBox::UpdateMass(void)
 {
 	inverseMass = 1.0 / (dim.x * dim.y * dim.z * 8.0f);
+	UpdateInertiaTensor();
 }
 
 void RigidBox::UpdateInertiaTensor(void)

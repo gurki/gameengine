@@ -7,6 +7,7 @@
 
 #include "Box.h"
 #include "Color.h"
+
 Box::Box(void) : Object3()
 {
 	SetDimensions(1, 1, 1);
@@ -19,6 +20,8 @@ Box::Box(const vec3& position, real width, real height, real depth) : Object3(po
 
 void Box::Render(void) const
 {
+	material.Bind();
+
 	glPushMatrix();
 	glMultMatrixf(world.v);
 
@@ -97,13 +100,7 @@ vec3 Box::GetDimensions(void) const
 	return dim * 2.0f;
 }
 
-vec3 Box::GetPointOnSurface(real u, real v, real w) const
+real Box::GetBoundingSphereRadius(void) const
 {
-	vec3 r;
-	
-	r.x = u * dim.x;
-	r.y = v * dim.y;
-	r.z = w * dim.z;
-	
-	return r;
+	return dim.Magnitude();
 }

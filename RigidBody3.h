@@ -9,6 +9,7 @@
 
 #include "Object3.h"
 #include "Matrix3x3.h"
+#include "MathLib.h"
 
 class RigidBody3 : public virtual Object3
 {
@@ -34,6 +35,13 @@ class RigidBody3 : public virtual Object3
 		void SetAngularVelocity(const vec3& velocity);
 
 		void SetMass(real mass);
+
+		// getter
+		vec3 GetLinearVelocity(void) const;
+		vec3 GetAngularVelocity(void) const;
+
+		real GetInverseMass(void) const;
+		mat3 GetInverseInertiaTensor(void) const;
 		
 	protected:
 
@@ -49,7 +57,4 @@ class RigidBody3 : public virtual Object3
 		// constant
 		real inverseMass;
 		mat3 inverseInertiaTensor;
-		
-		// derived
-		mat3 inverseWorldInertiaTensor;
 };
