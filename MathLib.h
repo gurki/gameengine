@@ -12,6 +12,7 @@
 
 #include <cmath>
 #include <climits>
+#include <cstdlib>
 
 #include "Types.h"
 

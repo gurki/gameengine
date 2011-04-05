@@ -6,6 +6,7 @@
 //***************************************************************************//
 
 #pragma once
+#pragma warning(disable: 4250)
 
 #include "MathLib.h"
 #include "Vector3.h"
@@ -33,16 +34,11 @@ class Object3
 		virtual void SetOrientation(const quat& orientation);
 		virtual void SetOrientation(real yaw, real pitch, real roll);
 
-		void SetElasticity(real elasticity);
 		void SetMaterial(const Material& material);
 
 		// getter
 		vec3 GetPosition(void) const;
 		quat GetOrientation(void) const;
-		
-		virtual real GetBoundingSphereRadius(void) const;
-		
-		real GetElasticity(void) const;
 
 	protected:
 
@@ -54,6 +50,5 @@ class Object3
 
 		trans3 world;
 
-		real elasticity;
 		Material material;
 };

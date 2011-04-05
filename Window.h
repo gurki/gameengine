@@ -21,8 +21,12 @@ class CWindow : public Rectangle
 {
 	public:
 
+		// methods
+		void Center(void);
 		void Initialize(void);
+		void ToggleFullScreen(void);
 
+		// setter
 		void SetPosition(const vec2& position);
 		void SetPosition(real x, real y);
 
@@ -31,21 +35,21 @@ class CWindow : public Rectangle
 
 		void SetTitle(const char* title);
 
-		void SetFullScreen(void);
-		
-		void Reset(void);
-		void Center(void);
-
+		// getter
 		const char* GetTitle(void) const;
 
 	private:
 
+		// variables
 		string title;
+		bool fullscreen;
 		
+		// private methods
 		static void Reshape(int width, int height);
 
 	public:
 
+		// singleton
 		static CWindow& GetInstance(void)
 		{
 			static CWindow Singleton;

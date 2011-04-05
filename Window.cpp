@@ -8,6 +8,7 @@
 #include "Window.h"
 #include "Camera.h"
 
+// constructors
 CWindow::CWindow(void) : Rectangle()
 {
 	dim = Screen.GetDimensions() * 0.64;
@@ -25,8 +26,33 @@ CWindow::CWindow(void) : Rectangle()
 	glutReshapeFunc(Reshape);
 }
 
+// methods
 void CWindow::Initialize(void) {}
 
+void CWindow::ToggleFullScreen(void)
+{
+	if(fullscreen == false)
+	{
+		SetDimensions(Screen.GetDimensions());
+		glutFullScreen();
+
+		fullscreen = true;
+	}
+	else
+	{
+		SetDimensions(Screen.GetDimensions() * 0.64);
+		Center();
+
+		fullscreen = false;
+	}
+}
+
+void CWindow::Center(void)
+{
+	SetPosition(Screen.GetCenter() - dim * 0.5);
+}
+
+// setter
 void CWindow::SetPosition(const vec2& position)
 {
 	pos = position;
@@ -62,23 +88,13 @@ void CWindow::SetTitle(const char* title)
 	glutSetWindowTitle(title);
 }
 
-void CWindow::SetFullScreen(void)
+// getter
+const char* CWindow::GetTitle(void) const
 {
-	SetDimensions(Screen.GetDimensions());
-	glutFullScreen();
+	return title.c_str();
 }
 
-void CWindow::Reset(void)
-{
-	SetDimensions(Screen.GetDimensions() * 0.64);
-	Center();
-}
-
-void CWindow::Center(void)
-{
-	SetPosition(Screen.GetCenter() - dim * 0.5);
-}
-
+// private methods
 void CWindow::Reshape(int width, int height)
 {
 	if(height == 0) 
@@ -92,9 +108,4 @@ void CWindow::Reshape(int width, int height)
 	{
 		Camera::GetActiveCamera()->UpdateViewport();
 	}
-}
-
-const char* CWindow::GetTitle(void) const
-{
-	return title.c_str();
 }

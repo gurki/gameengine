@@ -18,6 +18,7 @@ RigidBody3::RigidBody3(void) : Object3()
 	torques = vec3::Zero();
 
 	// constant
+	elasticity = 0.8f;
 	inverseMass = 1.0f;
 	UpdateInertiaTensor();
 	
@@ -105,6 +106,11 @@ void RigidBody3::SetMass(real mass)
 	UpdateInertiaTensor();
 }
 
+void RigidBody3::SetElasticity(real elasticity)
+{
+	this->elasticity = elasticity;
+}
+
 // getter
 vec3 RigidBody3::GetLinearVelocity(void) const
 {
@@ -124,4 +130,14 @@ real RigidBody3::GetInverseMass(void) const
 mat3 RigidBody3::GetInverseInertiaTensor(void) const
 {
 	return inverseInertiaTensor;
+}
+
+real RigidBody3::GetBoundingSphereRadius(void) const
+{
+	return 0.0f;
+}
+
+real RigidBody3::GetElasticity(void) const
+{
+	return elasticity;
 }

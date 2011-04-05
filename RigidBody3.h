@@ -35,6 +35,7 @@ class RigidBody3 : public virtual Object3
 		void SetAngularVelocity(const vec3& velocity);
 
 		void SetMass(real mass);
+		void SetElasticity(real elasticity);
 
 		// getter
 		vec3 GetLinearVelocity(void) const;
@@ -42,6 +43,10 @@ class RigidBody3 : public virtual Object3
 
 		real GetInverseMass(void) const;
 		mat3 GetInverseInertiaTensor(void) const;
+
+		real GetElasticity(void) const;
+		
+		virtual real GetBoundingSphereRadius(void) const;
 		
 	protected:
 
@@ -55,6 +60,7 @@ class RigidBody3 : public virtual Object3
 		vec3 torques;
 
 		// constant
+		real elasticity;
 		real inverseMass;
 		mat3 inverseInertiaTensor;
 };
