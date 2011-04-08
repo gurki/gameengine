@@ -33,7 +33,7 @@ void Cylinder::Render(void) const
 	material.Bind();
 
 	glPushMatrix();
-	glMultMatrixf(world.v);
+	glMultMatrixf(modelMatrix.v);
 
 	// surface
 	glBegin(GL_TRIANGLE_STRIP);

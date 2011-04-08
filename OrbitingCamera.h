@@ -7,31 +7,27 @@
 
 #pragma once
 
-#include "Object3.h"
+#ifndef _ORBITINGCAMERA_H
+#define _ORBITINGCAMERA_H
 
-class Sphere : public virtual Object3
+#include "Camera.h"
+
+class OrbitingCamera : public Camera
 {
 	public:
 
-		// constructors
-		Sphere(void);
-		Sphere(const vec3& position, real radius);
-
 		// methods
-		void Render(void) const;
-				
+		virtual void UpdateView(void);
+		virtual void Orbit(real latitude, real longitude);
+
 		// setter
-		virtual void SetRadius(real radius);
-		
-		// getter
-		real GetRadius(void) const;
-		real GetBoundingSphereRadius(void) const;
+		void SetTarget(const vec3& targetPosition);
+		void SetDistanceToTarget(real distance);
+		virtual void SetOrbit(real latitude, real longitude);
 
-		static vec3 GetPointOnSurface(real u, real v, real w);
-		static vec3 GetPointOnSurface(real theta, real phi);
+	protected:	
 
-	protected:
-
-		// variables
-		real radius;
+		vec3 target;
 };
+
+#endif

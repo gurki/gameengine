@@ -6,6 +6,7 @@
 //***************************************************************************//
 
 #include "Quaternion.h"
+#include "Matrix4x4.h"
 
 //***************************************************************************//
 //                                                                           //
@@ -278,11 +279,11 @@ Quaternion Quaternion::Conjugated(void) const
 //                                                                           //
 //***************************************************************************//
 
-Quaternion Quaternion::WithAxisAngle(const vec3& axis, real angle)
+Quaternion Quaternion::WithAxisAngle(const vec3& axis, real radians)
 {
 	Quaternion q;
 
-	real a = 0.5f * rad(angle);
+	real a = 0.5f * radians;
 	real s = sinr(a);
 	
 	vec3 v = axis;
@@ -301,9 +302,9 @@ Quaternion Quaternion::WithEulerAngles(real yaw, real pitch, real roll)
 {
 	Quaternion q;
 
-	real y = 0.5f * rad(yaw);
-	real r = 0.5f * rad(roll);
-	real p = 0.5f * rad(pitch);
+	real y = 0.5f * yaw;
+	real r = 0.5f * roll;
+	real p = 0.5f * pitch;
 
 	real siny = sinr(y);
 	real sinr = sinr(r);
@@ -313,11 +314,16 @@ Quaternion Quaternion::WithEulerAngles(real yaw, real pitch, real roll)
 	real cosr = cosr(r);
 	real cosp = cosr(p);
 
+	q.w = cosy * cosp * cosr + siny * sinp * sinr;   
+    q.x = cosy * sinp * cosr + siny * cosp * sinr;   
+    q.y = siny * cosp * cosr - cosy * sinp * sinr;   
+    q.z = cosy * cosp * sinr - siny * sinp * cosr;   
+	/*
 	q.w = cosy * cosr * cosp - siny * sinr * sinp;
 	q.x = siny * sinr * cosp + cosy * cosr * sinp;
 	q.y = siny * cosr * cosp + cosy * sinr * sinp;
 	q.z = cosy * sinr * cosp - siny * cosr * sinp;
-
+	*/
 	return q;
 }
 
@@ -346,6 +352,31 @@ Quaternion Quaternion::WithFromToOrientations(const vec3& from, const vec3& to)
 
 Quaternion Quaternion::WithOrientation(const vec3& orientation)
 {
+	 /*
+	 // Step 1. Setup basis vectors describing the rotation given the input vector and assuming an initial up direction of (0, 1, 0)
+	Vector3 vForward = orientation.Normalised();
+    Vector3 vUp = Vector3(0, 1.0f, 0.0f);           // Y Up vector
+    Vector3 vRight = vForward.Cross(vForward);    // The perpendicular vector to Up and Direction
+    vUp = vForward.Cross(vRight);            // The actual up vector given the direction and the right vector
+            
+    // Step 2. Put the three vectors into the matrix to bulid a basis rotation matrix
+    // This step isnt necessary, but im adding it because often you would want to convert from matricies to quaternions instead of vectors to quaternions
+    // If you want to skip this step, you can use the vector values directly in the quaternion setup below
+    Matrix4x4 mBasis = Matrix4x4(vRight.x, vRight.y, vRight.z, 0.0f,
+                                vUp.x, vUp.y, vUp.z, 0.0f,
+                                vForward.x, vForward.y, vForward.z, 0.0f,
+                                0.0f, 0.0f, 0.0f, 1.0f);
+            
+    // Step 3. Build a quaternion from the matrix
+    Quaternion qrot = Quaternion();
+    qrot.w = (float)sqrt(1.0f + mBasis.m11 + mBasis.m22 + mBasis.m33) / 2.0f;
+    double dfWScale = qrot.w * 4.0;
+    qrot.x = (float)((mBasis.m32 - mBasis.m23) / dfWScale);
+    qrot.y = (float)((mBasis.m13 - mBasis.m31) / dfWScale);
+    qrot.z = (float)((mBasis.m21 - mBasis.m12) / dfWScale);
+
+    return qrot;
+	*/
 	Quaternion q;
 
 	vec3 f = vec3::Forward();
@@ -366,11 +397,11 @@ Quaternion Quaternion::WithOrientation(const vec3& orientation)
 	return q;
 }
 
-Quaternion Quaternion::WithRotationAboutX(real angle)
+Quaternion Quaternion::WithRotationAboutX(real radians)
 {
 	Quaternion q;
 
-	real w = 0.5f * rad(angle);
+	real w = 0.5f * radians;
 	
 	q.w = cosr(w);
 	q.x = sinr(w);
@@ -380,11 +411,11 @@ Quaternion Quaternion::WithRotationAboutX(real angle)
 	return q;
 }
 
-Quaternion Quaternion::WithRotationAboutY(real angle)
+Quaternion Quaternion::WithRotationAboutY(real radians)
 {
 	Quaternion q;
 
-	real w = 0.5f * rad(angle);
+	real w = 0.5f * radians;
 
 	q.w = cosr(w);
 	q.x = 0.0;
@@ -394,11 +425,11 @@ Quaternion Quaternion::WithRotationAboutY(real angle)
 	return q;
 }
 
-Quaternion Quaternion::WithRotationAboutZ(real angle)
+Quaternion Quaternion::WithRotationAboutZ(real radians)
 {
 	Quaternion q;
 
-	real w = 0.5f * rad(angle);
+	real w = 0.5f * radians;
 
 	q.w = cosr(w);
 	q.x = 0.0;
@@ -422,7 +453,7 @@ AxisAngle Quaternion::GetAxisAngle(void) const
 	AxisAngle axisangle;
 
 	axisangle.axis = vec3(x, y, z);
-	axisangle.angle = deg(acosr(w) * 2.0f);
+	axisangle.angle = acosr(w) * 2.0f;
 
 	return axisangle;
 }
@@ -431,9 +462,9 @@ EulerAngles Quaternion::GetEulerAngles(void) const
 {
 	EulerAngles eulerangles;
 
-	eulerangles.yaw = deg(atan2r(2.0 * (w * x + y * z), 1.0 - 2.0 * (z * z + x * x)));
-	eulerangles.pitch = deg(asinr(2.0 * (w * z - y * x)));
-	eulerangles.roll = deg(atan2r(2.0 * (w * y + z * x), 1.0 - 2.0 * (y * y + z * z)));
+	eulerangles.yaw = atan2r(2.0 * (w * x + y * z), 1.0 - 2.0 * (z * z + x * x));
+	eulerangles.pitch = asinr(2.0 * (w * z - y * x));
+	eulerangles.roll = atan2r(2.0 * (w * y + z * x), 1.0 - 2.0 * (y * y + z * z));
 	
 	return eulerangles;
 }

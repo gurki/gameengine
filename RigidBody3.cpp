@@ -34,7 +34,7 @@ void RigidBody3::ApplyForceAtCenter(const vec3& force)
 void RigidBody3::ApplyForceAtBodyPoint(const vec3& force, const vec3& point)
 {
 	// forces += force;
-	torques += force.Cross( world.RotateFromLocalToWorld(point) );
+	torques += force.Cross( modelMatrix.RotateFromLocalToGlobal(point) );
 }
 
 void RigidBody3::ApplyTorque(const vec3& torque)
@@ -62,7 +62,7 @@ void RigidBody3::Update(real dt)
 	pos = 0.5f * temp * dt + linearVelocity * dt + pos;
 	
 	// angular movement
-	temp = torques * world.RotateFromLocalToWorld(inverseInertiaTensor) * dt;
+	temp = torques * modelMatrix.RotateFromLocalToGlobal(inverseInertiaTensor) * dt;
 
 	angularVelocity = temp + angularVelocity;
 	ori =  0.5 * quat(0, 0.5f * temp + angularVelocity) * ori * dt + ori;

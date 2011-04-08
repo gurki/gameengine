@@ -25,7 +25,7 @@ void Sphere::Render(void) const
 	material.Bind();
 
 	glPushMatrix();
-	glMultMatrixf(world.v);
+	glMultMatrixf(modelMatrix.v);
 
 	glutSolidSphere(radius, 20, 20);
 
@@ -44,16 +44,20 @@ real Sphere::GetRadius(void) const
 }
 
 
-vec3 Sphere::GetPointOnSurface(real u, real v, real w) const
+vec3 Sphere::GetPointOnSurface(real u, real v, real w)
 {
-	vec3 r(u, v, w);
+	vec3 r;
 	
-	r.Normalise() * radius;
+	r.x = u;
+	r.y = v;
+	r.z = w;
+	
+	r.Normalise();
 	
 	return r;
 }
 
-vec3 Sphere::GetPointOnSurface(real theta, real phi) const
+vec3 Sphere::GetPointOnSurface(real theta, real phi)
 {
 	vec3 r;
 	
@@ -63,7 +67,7 @@ vec3 Sphere::GetPointOnSurface(real theta, real phi) const
 	r.y = costheta * sinr(phi);
 	r.z = sinr(theta);
 	
-	return r * radius;
+	return r;
 }
 
 real Sphere::GetBoundingSphereRadius(void) const

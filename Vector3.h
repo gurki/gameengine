@@ -74,9 +74,9 @@ class Vector3
 			struct{ real x, y, z; };
 		};
 
-		static const Vector3 X(void);
-		static const Vector3 Y(void);
-		static const Vector3 Z(void);
+		static const Vector3 AxisX(void);
+		static const Vector3 AxisY(void);
+		static const Vector3 AxisZ(void);
 
 		static const Vector3 Up(void);
 		static const Vector3 Down(void);

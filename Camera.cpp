@@ -47,15 +47,15 @@ Camera::Camera(real x, real y, real z) : Object3(x, y, z)
 	frustum_far = 1000;
 }
 
-void Camera::UpdateView(void) const
+void Camera::UpdateView(void)
 {
-	AxisAngle a = ori.GetAxisAngle();
+	modelMatrix.SetRotation(ori);
+	modelMatrix.SetTranslation(pos);
 
-	glRotatef(-a.angle, a.axis.x, a.axis.y, a.axis.z);
-	glTranslatef(-pos.x, -pos.y, -pos.z);
+	glMultMatrixf(modelMatrix.Inversed().v);
 }
 
-void Camera::SetActive(void) const
+void Camera::SetActive(void)
 {
 	active = (Camera*)this;
 
@@ -63,7 +63,7 @@ void Camera::SetActive(void) const
 	UpdateView();
 }
 
-void Camera::UpdateViewport(void) const
+void Camera::UpdateViewport(void)
 {
 	vec2 p;
 	vec2 d;
@@ -144,32 +144,13 @@ void Camera::SetRelativeViewport(real x, real y, real width, real height)
 	UpdateViewport();
 }
 
-void Camera::Move(const vec3& vec)
-{
-	pos += vec;
-}
-
-void Camera::Move(real x, real y, real z)
-{
-	pos += vec3(x, y, z);
-}
-
-void Camera::MoveRelative(const vec3& vec)
-{
-	pos += ori * vec;
-}
-
-void Camera::MoveRelative(real x, real y, real z)
-{
-	pos += ori * vec3(x, y, z);
-}
-
 void Camera::LookAt(const vec3& point)
 {
 	vec3 d = point - pos;
+	d.Normalise();
 
-	real s = deg(atan2r(d.x, d.z)) + 180;
-	real t = deg(asinr(d.y / d.Magnitude()));
+	real s = atan2r(d.x, d.z) + C_PI;
+	real t = asinr(d.y);
 
 	ori = Quaternion::WithEulerAngles(s, t, 0);
 }
@@ -179,21 +160,12 @@ void Camera::LookAt(real x, real y, real z)
 	vec3 point(x, y, z);
 
 	vec3 d = point - pos;
+	d.Normalise();
 
-	real s = deg(atan2r(d.x, d.z)) + 180;
-	real t = deg(asinr(d.y / d.Magnitude()));
+	real s = atan2r(d.x, d.z) + C_PI;
+	real t = asinr(d.y);
 
 	ori = Quaternion::WithEulerAngles(s, t, 0);
-}
-
-void Camera::Rotate(const vec3& axis, real angle)
-{
-	ori *= Quaternion::WithAxisAngle(axis, angle);
-}
-
-void Camera::Rotate(real yaw, real pitch, real roll)
-{
-	ori *= Quaternion::WithEulerAngles(yaw, pitch, roll);
 }
 
 rect Camera::GetView(void)

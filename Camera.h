@@ -7,6 +7,9 @@
 
 #pragma once
 
+#ifndef _CAMERA_H
+#define _CAMERA_H
+
 #include "Object3.h"
 #include "Rectangle.h"
 
@@ -21,9 +24,9 @@ class Camera : public Object3
 		Camera(const vec3& position);
 		Camera(real x, real y, real z);
 		
-		void SetActive(void) const;
-		void UpdateView(void) const;
-		void UpdateViewport(void) const;
+		void SetActive(void);
+		virtual void UpdateView(void);
+		void UpdateViewport(void);
 		
 		void SetPerspective(void);
 		void SetOrthographic(void);
@@ -35,18 +38,9 @@ class Camera : public Object3
 		void SetAbsoluteViewport(uint x, uint y, uint width, uint height);
 		void SetRelativeViewport(real x, real y, real width, real height);
 
-		virtual void Move(const vec3& direction);
-		virtual void Move(real x, real y, real z);
-
-		virtual void MoveRelative(const vec3& direction);
-		virtual void MoveRelative(real x, real y, real z);
-
 		virtual void LookAt(const vec3& point);
 		virtual void LookAt(real x, real y, real z);
-
-		virtual void Rotate(const vec3& axis, real angle);
-		virtual void Rotate(real yaw, real pitch, real roll);
-
+		
 		rect GetView(void);
 		
 		static Camera* GetActiveCamera(void);
@@ -64,3 +58,5 @@ class Camera : public Object3
 		real frustum_near;
 		real frustum_far;
 };
+
+#endif

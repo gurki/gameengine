@@ -24,31 +24,8 @@ Transform3::Transform3(const vec3& translation, const quat& rotation)
 	m44 = 1;
 }
 	
-// vector arithmetics
-vec3 Transform3::operator * (const vec3& v) const
-{
-	vec3 r;
-	
-	r.x = v.x * m11 + v.y * m12 + v.z * m13 + m14;
-	r.y = v.x * m21 + v.y * m22 + v.z * m23 + m24;
-	r.z = v.x * m31 + v.y * m32 + v.z * m33 + m34;
-
-	return r;
-}
-
-vec3 operator * (const vec3& v, const Transform3& t)
-{
-	vec3 r;
-	
-	r.x = v.x * t.m11 + v.y * t.m12 + v.z * t.m13 + t.m14;
-	r.y = v.x * t.m21 + v.y * t.m22 + v.z * t.m23 + t.m24;
-	r.z = v.x * t.m31 + v.y * t.m32 + v.z * t.m33 + t.m34;
-
-	return r;
-}
-	
 // methods
-vec3 Transform3::TransformFromWorldToLocal(const vec3& v) const
+vec3 Transform3::TransformFromGlobalToLocal(const vec3& v) const
 {
 	vec3 r;
 
@@ -76,7 +53,7 @@ vec3 Transform3::TransformFromWorldToLocal(const vec3& v) const
 	return r;
 }
 
-vec3 Transform3::TransformFromLocalToWorld(const vec3& v) const
+vec3 Transform3::TransformFromLocalToGlobal(const vec3& v) const
 {
 	vec3 r;
 	
@@ -88,7 +65,7 @@ vec3 Transform3::TransformFromLocalToWorld(const vec3& v) const
 }
 
 
-vec3 Transform3::RotateFromLocalToWorld(const vec3& v) const
+vec3 Transform3::RotateFromLocalToGlobal(const vec3& v) const
 {
 	vec3 r;
 	
@@ -99,7 +76,7 @@ vec3 Transform3::RotateFromLocalToWorld(const vec3& v) const
 	return r;
 }
 
-mat3 Transform3::RotateFromLocalToWorld(const mat3& v) const
+mat3 Transform3::RotateFromLocalToGlobal(const mat3& v) const
 {
 	mat3 r;
 
@@ -116,6 +93,28 @@ mat3 Transform3::RotateFromLocalToWorld(const mat3& v) const
 	r.m33 = m33;
 	
 	return r * v * r.Transposed();
+}
+
+vec3 Transform3::ProjectPerspectiveFromLocalToGlobal(const vec3& v) const
+{
+	vec3 r;
+
+	r.x = m11 * v.x + m13 * v.z;
+	r.y = m22 * v.y + m23 * v.z;
+	r.z = m33 * v.z + m34;
+	
+	return r;
+}
+
+vec3 Transform3::ProjectOrthographicFromLocalToGlobal(const vec3& v) const
+{
+	vec3 r;
+
+	r.x = m11 * v.x + m14;
+	r.y = m22 * v.y + m24;
+	r.z = m33 * v.z + m34;
+	
+	return r;
 }
 
 // setter
@@ -181,6 +180,70 @@ Transform3& Transform3::SetTranslation(const vec3& translation)
 	return *this;
 }
 
+Transform3& Transform3::SetPerspectiveProjection(real left, real right, real bottom, real top, real near, real far)
+{
+	real temp = right - left;
+	real near2 = 2.0f * near;
+
+	m11 = near2 / temp;
+	m12 = 0.0f;
+	m13 = (right + left) / temp;
+	m14 = 0.0f;
+
+	temp = top - bottom;
+	
+	m21 = 0.0f;
+	m22 = near2 / temp;
+	m23 = (top + bottom) / temp;
+	m24 = 0.0f;
+
+	temp = near - far;
+
+	m31 = 0.0f;
+	m32 = 0.0f;
+	m33 = (near + far) / temp;
+	m34 = (near2 * far) / temp;
+
+	m41 = 0.0f;
+	m42 = 0.0f;
+	m43 =-1.0f;
+	m44 = 0.0f;
+
+	return *this;
+}
+
+Transform3& Transform3::SetOrthographicProjection(real left, real right, real bottom, real top, real near, real far)
+{
+	real temp = right - left;
+
+	m11 = 2 / temp;
+	m12 = 0.0f;
+	m13 = 0.0f;
+	m14 = - (right + left) / temp;
+
+	temp = top - bottom;
+	
+	m21 = 0.0f;
+	m22 = 2 / temp;
+	m23 = 0.0f;
+	m24 = - (top + bottom) / temp;
+
+	temp = near - far;
+
+	m31 = 0.0f;
+	m32 = 0.0f;
+	m33 = 2 / temp;
+	m34 = - (near + far) / temp;
+
+	m41 = 0.0f;
+	m42 = 0.0f;
+	m43 = 0.0f;
+	m44 = 1.0f;
+
+	return *this;
+}
+
+
 // getter
 mat3 Transform3::GetRotation(void) const
 {
@@ -209,60 +272,5 @@ vec3 Transform3::GetTranslation(void) const
 	r.y = m24;
 	r.z = m34;
 
-	return r;
-}
-
-// static getter
-Transform3 Transform3::With90DegreeRotationAboutX(void)
-{
-	static Transform3 r;
-	
-	r.SetRotationAboutAxis(vec3(1, 0, 0), C_PIDIV2);
-	
-	return r;
-}
-
-Transform3 Transform3::With90DegreeRotationAboutY(void)
-{
-	static Transform3 r;
-	
-	r.SetRotationAboutAxis(vec3(0, 1, 0), C_PIDIV2);
-	
-	return r;
-}
-
-Transform3 Transform3::With90DegreeRotationAboutZ(void)
-{
-	static Transform3 r;
-	
-	r.SetRotationAboutAxis(vec3(0, 0, 1), C_PIDIV2);
-	
-	return r;
-}
-
-Transform3 Transform3::With180DegreeRotationAboutX(void)
-{
-	static Transform3 r;
-	
-	r.SetRotationAboutAxis(vec3(1, 0, 0), C_PIDIV2);
-	
-	return r;
-}
-
-Transform3 Transform3::With180DegreeRotationAboutY(void)
-{
-	static Transform3 r;
-	
-	r.SetRotationAboutAxis(vec3(0, 1, 0), C_PI);
-	
-	return r;
-}
-
-Transform3 Transform3::With180DegreeRotationAboutZ(void)
-{
-	static Transform3 r;
-	
-	r.SetRotationAboutAxis(vec3(0, 0, 1), C_PI);
-	
 	return r;
 }

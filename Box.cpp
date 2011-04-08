@@ -23,7 +23,7 @@ void Box::Render(void) const
 	material.Bind();
 
 	glPushMatrix();
-	glMultMatrixf(world.v);
+	glMultMatrixf(modelMatrix.v);
 
 	glBegin(GL_TRIANGLE_STRIP);
 		

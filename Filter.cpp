@@ -8,14 +8,53 @@
 #include "Filter.h"
 
 // constructor
-Filter::Filter(real* matrix, uint rows, uint cols)
+Filter::Filter(void)
 {
+	this->rows = 0;
+	this->cols = 0;
+
 	this->matrix = 0;
+
+	this->verticalNeighbours = 0;
+	this->horizontalNeighbours = 0;
+}
+
+Filter::Filter(uint rows, uint cols)
+{
+	this->rows = 0;
+	this->cols = 0;
+
+	this->matrix = 0;
+
+	this->verticalNeighbours = 0;
+	this->horizontalNeighbours = 0;
 
 	if(rows % 2 != 0 && cols % 2 != 0)
 	{
-		this->vern = (cols - 1) / 2;
-		this->horn = (rows - 1) / 2;
+		this->verticalNeighbours = (cols - 1) / 2;
+		this->horizontalNeighbours = (rows - 1) / 2;
+	
+		this->rows =  rows;
+		this->cols =  cols;
+
+		this->matrix = new real[rows * cols];
+	}
+}
+
+Filter::Filter(real* matrix, uint rows, uint cols)
+{
+	this->rows = 0;
+	this->cols = 0;
+
+	this->matrix = 0;
+
+	this->verticalNeighbours = 0;
+	this->horizontalNeighbours = 0;
+
+	if(rows % 2 != 0 && cols % 2 != 0)
+	{
+		this->verticalNeighbours = (cols - 1) / 2;
+		this->horizontalNeighbours = (rows - 1) / 2;
 	
 		this->rows =  rows;
 		this->cols =  cols;
@@ -26,8 +65,6 @@ Filter::Filter(real* matrix, uint rows, uint cols)
 		{
 			this->matrix[i] = matrix[i];
 		}
-
-		Normalize();
 	}
 }
 
@@ -60,18 +97,18 @@ void Filter::Normalize(void)
 	}
 }
 
-void Filter::ApplyToData(real* data, uint dataRows, uint dataCols) const
+void Filter::ApplyToData(real* data, uint dataRows, uint dataCols, uint offset, uint stride) const
 {
 	// allocate memory for temporary data copy
-	real* temp = new real[dataRows * dataCols];
+	real* temp = new real[dataRows * dataCols / stride];
 
 	// loop through every point in data
 	for(uint dataRow = 0; dataRow < dataRows; dataRow++)
 	{
-		for(uint dataCol = 0; dataCol < dataCols; dataCol++)
+		for(uint dataCol = offset; dataCol < dataCols; dataCol += stride)
 		{
 			// zero current temp entry
-			temp[dataRow * dataCols + dataCol] = 0.0f;
+			temp[(dataRow * dataCols + dataCol) / stride] = 0.0f;
 			
 			// loop through every filter entry
 			for(uint filterRow = 0; filterRow < this->rows; filterRow++)
@@ -79,38 +116,101 @@ void Filter::ApplyToData(real* data, uint dataRows, uint dataCols) const
 				for(uint filterCol = 0; filterCol < this->cols; filterCol++)
 				{
 					// calculate datagridpoint of filtermatrix overlap
-					uint tempRow = dataRow + filterRow - vern;
-					uint tempCol = dataCol + filterCol - horn;
+					uint tempRow = dataRow + filterRow - verticalNeighbours;
+					uint tempCol = dataCol + (filterCol - horizontalNeighbours) * stride;
 
 					// check for out of bounds dataaccess
 					if(tempRow >= 0 && tempRow < dataRows && tempCol >= 0 && tempCol < dataCols)
 					{
 						// add filtered datavalue to temp
-						temp[dataRow * dataCols + dataCol] += data[tempRow * dataCols + tempCol] * matrix[filterRow * cols + filterCol]; 
+						temp[(dataRow * dataCols + dataCol) / stride] += data[tempRow * dataCols + tempCol] * matrix[filterRow * cols + filterCol]; 
 					} // end bounds check
 				} 
-			} // end filter loop
+			} // end filter loop 
 		}	
 	} // end data loop
 
 	// copy temp to original data
-	for(uint i = 0; i < dataRows * dataCols; i++)
+	for(uint i = 0; i < dataRows * dataCols / stride; i++)
 	{
-		data[i] = temp[i];
+		data[offset + i * stride] = temp[i];
 	}
 
 	// clean up
 	delete[] temp;
 }
 
+void Filter::ApplyNormToData(real* data, uint dataRows, uint dataCols, uint offset, uint stride) const
+{
+	// normaliuation factor
+	real norm = GetNorm();
+
+	// allocate memory for temporary data copy
+	real* temp = new real[dataRows * dataCols / stride];
+
+	// loop through every point in data
+	for(uint dataRow = 0; dataRow < dataRows; dataRow++)
+	{
+		for(uint dataCol = offset; dataCol < dataCols; dataCol += stride)
+		{
+			// zero current temp entry
+			temp[(dataRow * dataCols + dataCol) / stride] = 0.0f;
+			
+			// loop through every filter entry
+			for(uint filterRow = 0; filterRow < this->rows; filterRow++)
+			{
+				for(uint filterCol = 0; filterCol < this->cols; filterCol++)
+				{
+					// calculate datagridpoint of filtermatrix overlap
+					uint tempRow = dataRow + filterRow - verticalNeighbours;
+					uint tempCol = dataCol + (filterCol - horizontalNeighbours) * stride;
+
+					// check for out of bounds dataaccess
+					if(tempRow >= 0 && tempRow < dataRows && tempCol >= 0 && tempCol < dataCols)
+					{
+						// add filtered datavalue to temp
+						temp[(dataRow * dataCols + dataCol) / stride] += data[tempRow * dataCols + tempCol] * matrix[filterRow * cols + filterCol] * norm; 
+					} // end bounds check
+				} 
+			} // end filter loop 
+		}	
+	} // end data loop
+
+	// copy temp to original data
+	for(uint i = 0; i < dataRows * dataCols / stride; i++)
+	{
+		data[offset + i * stride] = temp[i];
+	}
+
+	// clean up
+	delete[] temp;
+}
+
+// getter
+real Filter::GetNorm(void) const
+{
+	real k = 0.0f;
+
+	for(uint i = 0; i < rows * cols; i++)
+	{
+		k += abs(matrix[i]);	
+	}
+
+	if(k == 0.0f)
+	{
+		return 0.0f;
+	}
+
+	return 1.0f / k;
+}
+
 // class getter
 Filter& Filter::Sobel(void)
 {
-	static real matrix[9] = {-1.0f,-2.0f,-1.0f,
-							  0.0f, 1.0f, 0.0f,
-							  1.0f, 2.0f, 1.0f};
+	static real matrix[9] = {-1,-2,-1,
+							  0, 1, 0,
+							  1, 2, 1};
 	static Filter filter(matrix, 3, 3);
-	filter.Normalize();
 
 	return filter;
 }
@@ -121,7 +221,6 @@ Filter& Filter::Lowpass(void)
 							 1, 1, 1, 
 							 1, 1, 1};
 	static Filter filter(matrix, 3, 3);
-	filter.Normalize();
 
 	return filter;
 }
@@ -132,7 +231,6 @@ Filter& Filter::Gaussian1(void)
 							 2, 4, 2, 
 							 1, 2, 1};
 	static Filter filter(matrix, 3, 3);
-	filter.Normalize();
 
 	return filter;
 }
@@ -145,7 +243,6 @@ Filter& Filter::Gaussian2(void)
 							  2, 4, 8,  4, 2,
 							  1, 2, 4,  2, 1};
 	static Filter filter(matrix, 5, 5);
-	filter.Normalize();
 
 	return filter;
 }
@@ -160,7 +257,6 @@ Filter& Filter::Gaussian3(void)
 							  2, 4,  8,  16, 8,  4,  2,
 							  1, 2,  4,  8,  4,  2,  1};
 	static Filter filter(matrix, 7, 7);
-	filter.Normalize();
 
 	return filter;
 }
@@ -168,18 +264,70 @@ Filter& Filter::Gaussian3(void)
 Filter& Filter::Gaussian4(void)
 {
 	static real matrix[81] = {1,  2,  4,  8,   16,  8,   4,  2,  1,
-							  2,  4,  8,  16,  32,  26,  8,  5,  2,
+							  2,  4,  8,  16,  32,  16,  8,  4,  2,
 							  4,  8,  16, 32,  64,  32,  16, 8,  4, 
 							  8,  16, 32, 64,  128, 64,  32, 16, 8,
 							  16, 32, 64, 128, 256, 128, 64, 32, 16,
 							  8,  16, 32, 64,  128, 64,  32, 16, 8,
 							  4,  8,  16, 32,  64,  32,  16, 8,  4, 
-							  2,  4,  8,  16,  32,  26,  8,  5,  2,
-						      1,  2,  4,  8,   16,  8,   2,  4,  1};
+							  2,  4,  8,  16,  32,  16,  8,  4,  2,
+						      1,  2,  4,  8,   16,  8,   4,  2,  1};
 	static Filter filter(matrix, 9, 9);
-	filter.Normalize();
 
 	return filter;
+}
+
+void Filter::SetGaussian(uint neighbours)
+{
+	this->~Filter();
+
+	verticalNeighbours = neighbours;
+	horizontalNeighbours = neighbours;
+
+	rows = neighbours * 2 + 1;
+	cols = neighbours * 2 + 1;
+	
+	matrix = new real[rows * cols];
+	
+	real m = 1.0f;
+	
+	for(uint row = 0; row <= neighbours; row++)
+	{
+		for(uint col = 0; col < neighbours; col++)
+		{
+			if(col != 0) 
+			{
+				m = matrix[row * cols + col - 1] * 2.0f;
+			}
+			else
+			{
+				if(row != 0) 
+				{
+					m = matrix[(row - 1) * cols] * 2.0f;
+				}
+				else 
+				{
+					m = 1.0f;
+				}
+			}
+
+			matrix[row * cols + col] = m;
+			matrix[row * cols + (cols - 1) - col] = m;
+
+			if(row != neighbours)
+			{
+				matrix[cols * (cols - 1) - row * cols + col] = m;
+				matrix[cols * (cols - 1) - row * cols + (cols - 1) - col] = m;
+			}
+		}
+		
+		matrix[row * cols + neighbours] = m * 2.0f;
+
+		if(row != neighbours)
+		{
+			matrix[cols * (cols - 1) - row * cols + neighbours] = m * 2.0f;
+		}
+	}
 }
 
 Filter& Filter::Sharpening(void)
@@ -188,7 +336,6 @@ Filter& Filter::Sharpening(void)
 							 -1, 5,-1,
 							  0,-1, 0};
 	static Filter filter(matrix, 3, 3);
-	filter.Normalize();
 
 	return filter;
 }
@@ -199,7 +346,6 @@ Filter& Filter::VerticalSharpening(void)
 							 -1, 3,-1,
 							 -1, 2,-1};
 	static Filter filter(matrix, 3, 3);
-	filter.Normalize();
 
 	return filter;
 }
@@ -211,7 +357,6 @@ Filter& Filter::HorizontalSharpening(void)
 							  2, 3, 2,
 							 -1,-1,-1};
 	static Filter filter(matrix, 3, 3);
-	filter.Normalize();
 
 	return filter;
 }
@@ -222,7 +367,6 @@ Filter& Filter::EdgeDetectionUpperLeft(void)
 							  0, 0, 0,
 							  0, 0,-1};
 	static Filter filter(matrix, 3, 3);
-	filter.Normalize();
 
 	return filter;
 }
@@ -233,7 +377,54 @@ Filter& Filter::EdgeDetectionLowerRight(void)
 							  0, 0, 0,
 							  0, 0, 1};
 	static Filter filter(matrix, 3, 3);
-	filter.Normalize();
 
 	return filter;
+}
+
+// streams
+ostream& operator << (ostream& out, const Filter& filter)
+{
+	for(uint row = 0; row < filter.rows; row++)
+	{
+		cout << "{";
+
+		for(uint col = 0; col < filter.cols; col++)
+		{
+			out << filter.matrix[row * filter.cols + col];
+
+			if(col != filter.cols - 1)
+			{
+				cout << ", ";
+			}
+		}
+
+		cout << "}" << endl;
+	}
+
+	return out;
+}
+
+istream& operator >> (istream& in, Filter& filter)
+{
+	uint rows;
+	uint cols;
+
+	cout << "Filter Rows: ";
+	in >> rows;
+	cout << "Filter Columns: ";
+	in >> cols;
+
+	real* matrix = new real[rows * cols];
+
+	for(uint i = 0; i < rows * cols; i++)
+	{
+		cin >> matrix[i];
+	}
+
+	filter.~Filter();
+	filter = Filter(matrix, rows, cols);
+
+	delete[] matrix;
+
+	return in;
 }

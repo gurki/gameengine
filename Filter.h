@@ -13,18 +13,32 @@
 #include "Types.h"
 #include "MathLib.h"
 
+#include <iostream>
+#include <iomanip>
+
+using namespace std;
+
 class Filter
 {
 	public:
 
 		// constructor
+		Filter(void);
+		Filter(uint rows, uint cols);
 		Filter(real* matrix, uint rows, uint cols);
 		~Filter(void);
 
 		// methods
 		void Normalize(void);
-		virtual void ApplyToData(real* data, uint rows, uint cols) const;
+		virtual void ApplyToData(real* data, uint dataRows, uint dataCols, uint offset = 0, uint stride = 1) const;
+		virtual void ApplyNormToData(real* data, uint dataRows, uint dataCols, uint offset = 0, uint stride = 1) const;
 		
+		// setter
+		void SetGaussian(uint neighbours);
+
+		// getter
+		real GetNorm(void) const;
+
 		// class getter
 		static Filter& Sobel(void);
 
@@ -41,16 +55,21 @@ class Filter
 		static Filter& EdgeDetectionUpperLeft(void);
 		static Filter& EdgeDetectionLowerRight(void);
 
+		// streams
+		friend ostream& operator << (ostream& out, const Filter& filter);
+		friend istream& operator >> (istream& in, Filter& filter);
+
+		// public variables
+		real* matrix;
+
 	protected:
 
 		// variables
-		uint horn;
-		uint vern;
+		uint verticalNeighbours;
+		uint horizontalNeighbours;
 
 		uint rows;
 		uint cols;
-
-		real* matrix;
 };
 
 #endif

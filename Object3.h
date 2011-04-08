@@ -48,7 +48,7 @@ class Object3
 		vec3 pos;
 		quat ori;
 
-		trans3 world;
+		trans3 modelMatrix;
 
 		Material material;
 };

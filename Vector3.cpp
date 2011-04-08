@@ -265,19 +265,19 @@ istream& operator >> (istream& in, Vector3& vec)
 }	
 
 // static members
-const Vector3 Vector3::X(void)
+const Vector3 Vector3::AxisX(void)
 {
 	static const Vector3 vec(1, 0, 0);
 	return vec;
 }
 
-const Vector3 Vector3::Y(void)
+const Vector3 Vector3::AxisY(void)
 {
 	static const Vector3 vec(0, 1, 0);
 	return vec;
 }
 
-const Vector3 Vector3::Z(void)
+const Vector3 Vector3::AxisZ(void)
 {
 	static const Vector3 vec(0, 0, 1);
 	return vec;

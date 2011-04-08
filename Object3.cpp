@@ -40,33 +40,33 @@ void Object3::Render(void) const
 
 void Object3::UpdateWorldMatrix(void)
 {
-	world.SetTranslation(pos);
-	world.SetRotation(ori);
+	modelMatrix.SetTranslation(pos);
+	modelMatrix.SetRotation(ori);
 }
 
 // setter
 void Object3::SetPosition(const vec3& position)
 {
 	pos = position;
-	world.SetTranslation(pos);
+	modelMatrix.SetTranslation(pos);
 }
 
 void Object3::SetPosition(real x, real y, real z)
 {
 	pos = vec3(x, y, z);
-	world.SetTranslation(pos);
+	modelMatrix.SetTranslation(pos);
 }
 
 void Object3::SetOrientation(const quat& orientation)
 {
 	ori = orientation;
-	world.SetRotation(ori);
+	modelMatrix.SetRotation(ori);
 }
 
 void Object3::SetOrientation(real yaw, real pitch, real roll)
 {
 	ori = Quaternion::WithEulerAngles(yaw, pitch, roll);
-	world.SetRotation(ori);
+	modelMatrix.SetRotation(ori);
 }
 
 void Object3::SetMaterial(const Material& material)
