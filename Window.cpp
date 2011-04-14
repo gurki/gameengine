@@ -103,9 +103,10 @@ void CWindow::Reshape(int width, int height)
 	}
 
 	Window.SetDimensions(width, height);
-
+	/*
 	if(Camera::GetActiveCamera() != 0)
 	{
 		Camera::GetActiveCamera()->UpdateViewport();
 	}
+	*/
 }

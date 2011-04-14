@@ -8,15 +8,49 @@
 #include "GameEngine.h"
 
 #include "Grid3.h"
-#include "Terrain.h"
 #include "OrbitingCamera.h"
+
+#include "Terrain.h"
+#include "OpenGL.h"
+#include "File.h"
 
 OrbitingCamera cam;
 Grid3 grid;
-
-bool bounding = false;
-
 Terrain terrain(10, 10, 10);
+
+void printShaderInfoLog(GLuint obj)
+{
+    int infologLength = 0;
+    int charsWritten  = 0;
+    char *infoLog;
+
+    glGetShaderiv(obj, GL_INFO_LOG_LENGTH,&infologLength);
+
+    if (infologLength > 0)
+    {
+        infoLog = (char *)malloc(infologLength);
+        glGetShaderInfoLog(obj, infologLength, &charsWritten, infoLog);
+	printf("%s\n",infoLog);
+        free(infoLog);
+    }
+}
+
+void printProgramInfoLog(GLuint obj)
+{
+    int infologLength = 0;
+    int charsWritten  = 0;
+    char *infoLog;
+
+    glGetProgramiv(obj, GL_INFO_LOG_LENGTH,&infologLength);
+
+    if (infologLength > 0)
+    {
+        infoLog = (char *)malloc(infologLength);
+        glGetProgramInfoLog(obj, infologLength, &charsWritten, infoLog);
+	printf("%s\n",infoLog);
+        free(infoLog);
+    }
+}
 
 int main(int argc, char* argv[])
 {
@@ -24,32 +58,84 @@ int main(int argc, char* argv[])
 	GameEngine.Initialize(argc, argv);
 
 	// initialize objects
-	cam.SetPosition(-5, 10, 15);
-	cam.LookAt(0, 0, 0);
-
+	cam.SetViewport(0, 0, Window.GetDimensions().x, Window.GetDimensions().y);
 	grid.SetDimensions(10, 10);
+	terrain.GenerateRandomTerrain();
+	
+	// initialize glew
+	glewInit();
+	
+	if(glewIsSupported("GL_VERSION_2_0")) 
+	{
+		cout << "GLEW initialized" << endl;
+	}
 
-	terrain.SetTileSize(0.1f, 0.1f);
+	uint v = glCreateShader(GL_VERTEX_SHADER);
+	uint f = glCreateShader(GL_FRAGMENT_SHADER);
+	
+	File vert;
+	File frag;
 
-	Mouse.HideCursor();
+	vert.LoadFromFile("C:/Users/Gurki/Documents/My Dropbox/Programming/DirectionalPerPixelLighting.vert");
+	frag.LoadFromFile("C:/Users/Gurki/Documents/My Dropbox/Programming/DirectionalPerPixelLighting.frag");
+	
+	const char* vc = vert.GetData();
+	const char* fc = frag.data;
+		
+	glShaderSource(v, 1, &vc, 0);
+	glShaderSource(f, 1, &fc, 0);
+	
+	vert.~File();
+	frag.~File();
+	
+	glCompileShader(v);
+	glCompileShader(f);
+	
+	uint p = glCreateProgram();
 
+	glAttachShader(p, v);
+	glAttachShader(p, f);
+
+	glLinkProgram(p);
+	glUseProgram(p);
+
+	printShaderInfoLog(v);
+	printShaderInfoLog(f);
+	printProgramInfoLog(p);
+	
 	// start game
 	GameEngine.Start();
 
+	// clean up
+	glDetachShader(p, v);
+	glDetachShader(p, f);
+
+	glDeleteShader(v);
+	glDeleteShader(f);
+
+	system("PAUSE");
 	return 0;
 }
 
 void CGameEngine::Render(void) const
 {
-	cam.SetActive();
-	// grid.Render();
+	cam.Enable();
+
+	// initialize lights
+	GLfloat mat_specular[] = { 1.0, 1.0, 1.0, 1.0 };
+    GLfloat mat_shininess[] = { 50.0 };
+
+    GLfloat light_position[] = { 10.0, 10.0, 10.0, 0.0 };
+	GLfloat light_direction[] = {-1.0, -1.0, -1.0};
+
+    glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
+    glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
+
+	glLightfv(GL_LIGHT0, GL_SPOT_DIRECTION, light_direction);
+	glLightfv(GL_LIGHT0, GL_POSITION, light_position);
 
 	terrain.Render();
-	
-	if(bounding)
-	{
-		terrain.RenderBoundingBox();
-	}
+	//grid.Render();
 }
 
 void CGameEngine::Idle(void) const
@@ -59,32 +145,16 @@ void CGameEngine::Idle(void) const
 
 void CGameEngine::Input(void) const
 {
-	// terrain
-	static real lastTime = Time.GetRunTime();
-	static real dt = 0.0f;
-	
-	dt = Time.GetRunTime() - lastTime;
+	static real last = Time.GetRunTime();
 
-	if(dt > 0.075f)
+	if(Time.GetRunTime() - last > 0.1f)
 	{
 		if(Keyboard.KeyIsPressed('e')) terrain.Erode(1);
 		if(Keyboard.KeyIsPressed('s')) terrain.Smooth(1);
 
-		lastTime = Time.GetRunTime();
+		last = Time.GetRunTime();
 	}
 
-	if(Keyboard.KeyWasPressed('b'))
-	{
-		if(bounding == false)
-		{
-			bounding = true;
-		}
-		else
-		{
-			bounding = false;
-		}
-	}
-	if(Keyboard.KeyWasPressed('a')) terrain.SetHeight(10.0f);
 	if(Keyboard.KeyWasPressed('r')) terrain.GenerateRandomTerrain();
 
 	// game
@@ -106,27 +176,9 @@ void CGameEngine::Input(void) const
 			wireframe = false;
 		}
 	}
-	
-	// camera
-	real s = Time.GetTimeDelta();
 
-	if(Mouse.HasMoved() && Mouse.ButtonIsPressed(GLUT_LEFT_BUTTON))
+	if(Mouse.ButtonIsPressed(BUTTON_LEFT))
 	{
-		cam.Orbit(Mouse.PositionDelta().x * s, -Mouse.PositionDelta().y * s);
-
-		Mouse.Center();
-	}
-
-
-	static real d = cam.GetPosition().Magnitude();
-
-	if(Mouse.HasMoved() && Mouse.ButtonIsPressed(GLUT_RIGHT_BUTTON))
-	{
-		d -= Mouse.PositionDelta().y * s;
-		d = abs(d);
-
-		cam.SetDistanceToTarget(d);
-
-		Mouse.Center();
+		cam.Orbit(Mouse.PositionDelta().x * Time.GetTimeDelta(), 0);
 	}
 }

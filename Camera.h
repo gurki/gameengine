@@ -10,53 +10,41 @@
 #ifndef _CAMERA_H
 #define _CAMERA_H
 
-#include "Object3.h"
-#include "Rectangle.h"
+#include "Transform3.h"
 
-#define CAMERA_PERSPECTIVE  1
-#define CAMERA_ORTHOGRAPHIC 2
-
-class Camera : public Object3
+class Camera
 {
 	public:
 		
+		// constructors
 		Camera(void);
-		Camera(const vec3& position);
-		Camera(real x, real y, real z);
-		
-		void SetActive(void);
-		virtual void UpdateView(void);
-		void UpdateViewport(void);
-		
-		void SetPerspective(void);
-		void SetOrthographic(void);
 
-		void SetFieldOfView(real fovy);
-		void SetAspectRatio(real ratio);
-		void SetNearFar(real near, real far);
+		// methods
+		void Enable(void);
 
-		void SetAbsoluteViewport(uint x, uint y, uint width, uint height);
-		void SetRelativeViewport(real x, real y, real width, real height);
+		void LookAt(const vec3& target);
+		void LookAt(real x, real y, real z);
 
-		virtual void LookAt(const vec3& point);
-		virtual void LookAt(real x, real y, real z);
+		// setter
+		void SetPosition(real x, real y, real z);
+		void SetViewport(real x, real y, real width, real height);
+
+		// getter
+		Vector3 GetPosition(void) const;
+
+	protected:
 		
-		rect GetView(void);
-		
-		static Camera* GetActiveCamera(void);
-		
+		// variables
+		Vector3 pos;
+		Vector3 up;
+
+		Transform3 viewMatrix;
+		Transform3 projectionMatrix;
+
 	private:
 
-		static Camera* active;
-		
-		uint projection;
-
-		rect view;
-
-		real frustum_ratio;
-		real frustum_fovy;
-		real frustum_near;
-		real frustum_far;
+		// class variables
+		bool cameraSwitch;
 };
 
 #endif

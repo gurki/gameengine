@@ -7,25 +7,34 @@
 
 #pragma once
 
-#ifndef _ORBITINGCAMERA_H
-#define _ORBITINGCAMERA_H
+#ifndef _FILE_H
+#define _FILE_H
 
-#include "Camera.h"
+#include "Types.h"
 
-class OrbitingCamera : public Camera
+#include <iostream>
+#include <fstream>
+
+using namespace std;
+
+class File
 {
 	public:
 
+		// constructors
+		File(void);
+		~File(void);
+
 		// methods
-		void Orbit(real azimuth, real inclination);
+		void LoadFromFile(const char* path);
 
-		// setter
-		void SetTarget(const vec3& target);
+		// getter
+		char* GetData(void) const;
 
-	protected:
+	// protected:
 
 		// variables
-		vec3 target;
+		char* data;
 };
 
 #endif

@@ -37,11 +37,15 @@ class Transform3 : public Matrix4x4
 		// setter
 		Transform3& SetRotation(const quat& rotation);
 		Transform3& SetRotationAboutAxis(const vec3& axis, real radians);
+		Transform3& SetRotationWithOrthogonalAxis(const vec3& right, const vec3& up, const vec3& forward);
 
 		Transform3& SetTranslation(const vec3& translation);
 
+		Transform3& SetPerspectiveProjection(real fov, real aspect, real near, real far);
 		Transform3& SetPerspectiveProjection(real left, real right, real bottom, real top, real near, real far);
 		Transform3& SetOrthographicProjection(real left, real right, real bottom, real top, real near, real far);
+
+		Transform3& SetLookAt(const vec3& eye, const vec3& center, const vec3& up);
 
 		// getter
 		mat3 GetRotation(void) const;

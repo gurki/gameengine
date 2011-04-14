@@ -9,38 +9,36 @@
 #include "Sphere.h"
 
 // methods
-void OrbitingCamera::UpdateView(void)
-{
-	gluLookAt(pos.x, pos.y, pos.z, target.x, target.y, target.z, 0.0f, 1.0f, 0.0f);
-}
-
 void OrbitingCamera::Orbit(real latitude, real longitude)
 {
 	vec3 d = pos - target;
+	d.y = 0;
+	real r = d.Magnitude();
 	
-	quat rot = quat::WithEulerAngles(latitude, longitude, 0.0f);
+	d /= r;
+	/*
+	real theta = acosr(d.z);
+	real phi = atan2r(d.x, d.y); 
+	*/
+	static real phi = 0;
+	static real theta = 0.0f;
 
-	d = d * rot;
+	phi += longitude;
+	theta += latitude;
+
+	d.x = r * cosr(theta) * cosr(phi);
+	d.y = 10; // r * cosr(theta) * sinr(phi);
+	d.z = r * sinr(theta);
 
 	pos = target + d;
+
+	LookAt(target.x, target.y, target.z);
 }
 
 // setter
-void OrbitingCamera::SetTarget(const vec3& targetPosition)
+void OrbitingCamera::SetTarget(const vec3& target)
 {
-	target = targetPosition;
-}
+	this->target = target;
 
-void OrbitingCamera::SetDistanceToTarget(real distance)
-{
-	vec3 d = pos - target;
-
-	d.Normalise();
-
-	pos = target + distance * d;
-}
-
-void OrbitingCamera::SetOrbit(real latitude, real longitude)
-{
-	pos = target + (target - pos).Magnitude() * Sphere::GetPointOnSurface(latitude, longitude);
+	LookAt(target.x, target.y, target.z);
 }

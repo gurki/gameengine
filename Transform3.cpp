@@ -171,12 +171,58 @@ Transform3& Transform3::SetRotationAboutAxis(const vec3& axis, real radians)
 	return *this; 
 }
 
+Transform3& Transform3::SetRotationWithOrthogonalAxis(const vec3& right, const vec3& up, const vec3& forward)
+{
+	m11 = right.x;
+	m12 = right.y;
+	m13 = right.z;
+
+	m21 = up.x;
+	m22 = up.y;
+	m23 = up.z;
+
+	m31 = forward.x;
+	m32 = forward.y;
+	m33 = forward.z;
+
+	return *this;
+}
+
 Transform3& Transform3::SetTranslation(const vec3& translation)
 {
 	m14 = translation.x;
 	m24 = translation.y;
 	m34 = translation.z;
 	
+	return *this;
+}
+
+Transform3& Transform3::SetPerspectiveProjection(real fov, real aspect, real near, real far)
+{
+	real temp = 1.0f / tanr(fov * 0.5f);
+
+	m11 = temp / aspect;
+	m12 = 0.0f;
+	m13 = 0.0f;
+	m14 = 0.0f;
+
+	m21 = 0.0f;
+	m22 = temp;
+	m23 = 0.0f;
+	m24 = 0.0f;
+
+	temp = near - far;
+
+	m31 = 0.0f;
+	m32 = 0.0f;
+	m33 = (near + far) / temp;
+	m34 = (2.0f * near * far) / temp;
+
+	m41 = 0.0f;
+	m42 = 0.0f;
+	m43 =-1.0f;
+	m44 = 0.0f;
+
 	return *this;
 }
 
@@ -243,6 +289,38 @@ Transform3& Transform3::SetOrthographicProjection(real left, real right, real bo
 	return *this;
 }
 
+Transform3& Transform3::SetLookAt(const vec3& eye, const vec3& center, const vec3& up)
+{
+	vec3 f = center - eye;
+	f.Normalise();
+
+	vec3 s = f.Cross(up);
+	s.Normalise();
+
+	vec3 u = s.Cross(f);
+	
+	m11 = s.x; 	
+	m13 = s.y; 	
+	m13 = s.z; 	
+	m14 =-s.x * eye.x - s.y * eye.y - s.z * eye.z;
+
+	m21 = u.x; 	
+	m23 = u.y; 	
+	m23 = u.z; 	
+	m24 =-u.x * eye.x - u.y * eye.y - u.z * eye.z;
+
+	m31 =-f.x; 	
+	m33 =-f.y; 	
+	m33 =-f.z; 	
+	m34 = f.x * eye.x + f.y * eye.y + f.z * eye.z;
+	
+	m41 = 0.0f;
+	m42 = 0.0f;
+	m43 = 0.0f;
+	m44 = 1.0f;
+	
+	return *this;
+}
 
 // getter
 mat3 Transform3::GetRotation(void) const

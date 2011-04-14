@@ -7,173 +7,76 @@
 
 #include "Camera.h"
 #include "OpenGL.h"
-#include "Window.h"
 
-Camera* Camera::active = 0;
-
-Camera::Camera(void) : Object3()
+// constructors
+Camera::Camera(void)
 {
-	projection = CAMERA_PERSPECTIVE;
+	pos = vec3(-5.0f, 10.0f, 15.0f);
+	up = Vector3::Up();
 
-	view = rect(0, 0, 1, 1);
+	real fov = rad(45.0f);
+	real aspect = 16.0f / 9.0f;
 
-	frustum_ratio = 16.0 / 9.0;
-	frustum_fovy = 45.0;
-	frustum_near = 0.1;
-	frustum_far = 1000;
+	real near = 1.0f;
+	real far = 1000.0f;
+
+	real top = tanr(rad(fov) * 0.5f) * near;
+    real bottom = -top;
+
+    real left = aspect * bottom;
+    real right = aspect * top;
+
+	projectionMatrix.SetPerspectiveProjection(fov, aspect, near, far);
+	LookAt(0.0f, 0.0f, 0.0f);
 }
 
-Camera::Camera(const vec3& position) : Object3(position)
+// methods
+void Camera::Enable(void)
 {
-	projection = CAMERA_PERSPECTIVE;
-
-	view = rect(0, 0, 1, 1);
-
-	frustum_ratio = 16.0 / 9.0;
-	frustum_fovy = 45.0;
-	frustum_near = 0.1;
-	frustum_far = 1000;
-}
-
-Camera::Camera(real x, real y, real z) : Object3(x, y, z)
-{
-	projection = CAMERA_PERSPECTIVE;
-
-	view = rect(0, 0, 1, 1);
-
-	frustum_ratio = 16.0 / 9.0;
-	frustum_fovy = 45.0;
-	frustum_near = 0.1;
-	frustum_far = 1000;
-}
-
-void Camera::UpdateView(void)
-{
-	modelMatrix.SetRotation(ori);
-	modelMatrix.SetTranslation(pos);
-
-	glMultMatrixf(modelMatrix.Inversed().v);
-}
-
-void Camera::SetActive(void)
-{
-	active = (Camera*)this;
-
-	UpdateViewport();
-	UpdateView();
-}
-
-void Camera::UpdateViewport(void)
-{
-	vec2 p;
-	vec2 d;
-
-	p.x = view.GetPosition().x * Window.GetDimensions().x; 
-	p.y = view.GetPosition().y * Window.GetDimensions().y;
-
-	d.x = view.GetDimensions().x * Window.GetDimensions().x;
-	d.y = view.GetDimensions().y * Window.GetDimensions().y;
-
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-
-	if(projection == CAMERA_ORTHOGRAPHIC)
-	{
-		glOrtho(0, d.x, 0, d.y, frustum_near, frustum_far);
-		glViewport(p.x, p.y, d.x, d.y);
-	}
-	else 
-	{
-		gluPerspective(frustum_fovy, frustum_ratio, frustum_near, frustum_far);
-		glViewport(p.x, p.y, d.x, d.y);
-	}
+	glLoadMatrixf(projectionMatrix.v);
 
 	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+	glLoadMatrixf(viewMatrix.v);
 }
 
-void Camera::SetPerspective(void)
+void Camera::LookAt(const vec3& target)
 {
-	projection = CAMERA_PERSPECTIVE;
-
-	UpdateViewport();
-}
-
-void Camera::SetOrthographic(void)
-{
-	projection = CAMERA_ORTHOGRAPHIC;
-	frustum_near = 0.0;
-
-	UpdateViewport();
-}
-
-void Camera::SetFieldOfView(real fovy)
-{
-	this->frustum_fovy = inf(fovy, 1);
-	
-	UpdateViewport();
-}
-
-void Camera::SetAspectRatio(real ratio)
-{
-	this->frustum_ratio = ratio;
-
-	UpdateViewport();
-}
-
-void Camera::SetNearFar(real near, real far)
-{
-	this->frustum_far = inf(far, 0);
-	this->frustum_near = limit(near, 0, far);
-	
-	UpdateViewport();
-}
-
-void Camera::SetAbsoluteViewport(uint x, uint y, uint width, uint height)
-{
-	vec2 w = Window.GetDimensions();
-
-	view = rect(x / w.x, y / w.y, width / w.x, height / w.y);
-	
-	UpdateViewport();
-}
-
-void Camera::SetRelativeViewport(real x, real y, real width, real height)
-{
-	view = rect(x, y, width, height);
-	
-	UpdateViewport();
-}
-
-void Camera::LookAt(const vec3& point)
-{
-	vec3 d = point - pos;
-	d.Normalise();
-
-	real s = atan2r(d.x, d.z) + C_PI;
-	real t = asinr(d.y);
-
-	ori = Quaternion::WithEulerAngles(s, t, 0);
+	viewMatrix.SetLookAt(pos, target, up);
 }
 
 void Camera::LookAt(real x, real y, real z)
 {
-	vec3 point(x, y, z);
-
-	vec3 d = point - pos;
-	d.Normalise();
-
-	real s = atan2r(d.x, d.z) + C_PI;
-	real t = asinr(d.y);
-
-	ori = Quaternion::WithEulerAngles(s, t, 0);
+	viewMatrix.SetLookAt(pos, vec3(x, y, z), up);
 }
 
-rect Camera::GetView(void)
+// setter
+void Camera::SetPosition(real x, real y, real z)
 {
-	return view;
+	pos.x = x;
+	pos.y = y;
+	pos.z = z;
 }
 
-Camera* Camera::GetActiveCamera(void)
+void Camera::SetViewport(real x, real y, real width, real height)
 {
-	return active;
+	glViewport(x, y, width, height);
 }
+
+// getter
+Vector3 Camera::GetPosition(void) const
+{
+	return pos;
+}
+
+/*
+    fov*0.5 = arctan ((top-bottom)*0.5 / near)
+
+    top = tan(fov*0.5) * near
+    bottom = -top
+
+    left = aspect * bottom
+    right = aspect * top
+*/
