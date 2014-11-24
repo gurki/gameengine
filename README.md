@@ -1,1 +1,1 @@
-After finishing my final school project - a 2d physics engine in Flash and AS -, I wanted to explore the vast and unknown world of 3d games. I set out and started my own math, graphics and physics library. Here you go. Don't judge me, I was young! :D
+After finishing my final school project - a 2d physics engine in Flash and AS -, I wanted to explore the vast and to me unknown third dimension. I set out and started my own math, graphics and physics library, which I decided to put here for the sake of nostalgy. Good old times.
